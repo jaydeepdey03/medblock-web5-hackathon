@@ -1,10 +1,10 @@
 "use client";
 
-import {useTheme} from "next-themes";
-import {FiMoon, FiSun} from "react-icons/fi";
+import { useTheme } from "next-themes";
+import { FiMoon, FiSun } from "react-icons/fi";
 
 export default function Toggletheme() {
-  const {theme, setTheme} = useTheme();
+  const { theme, setTheme } = useTheme();
   return (
     <>
       <button
