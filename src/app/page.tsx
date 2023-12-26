@@ -8,7 +8,7 @@ export default function Home() {
       <div className="flex h-full w-full justify-center p-5 font-poppins">
         <div className="relative flex h-full w-full flex-col rounded-xl bg-blue-900 xl:flex-row">
           <div className="grid h-full w-full place-items-center rounded-xl ">
-            <div className="flex flex-col items-center space-y-8 xl:items-start">
+            <div className="flex flex-col items-center space-y-8 text-center xl:items-start">
               <p className="text-8xl font-extrabold text-pink-200">MedBlock</p>
               <p className="text-xl font-semibold text-pink-100">
                 Your Decentralized Patient ID for Modern Appointments
@@ -38,7 +38,7 @@ export default function Home() {
             <p className="text-3xl font-bold text-blue-900 2xl:text-5xl">
               Decentralized Patient IDs
             </p>
-            <p className="text-lg text-blue-950">
+            <p className="font-inter text-lg text-blue-950">
               Seize control of your health with decentralized IDs for a private,
               modern experience
             </p>
@@ -61,7 +61,7 @@ export default function Home() {
             <p className="text-3xl font-bold text-blue-900 2xl:text-5xl">
               Seamless Appointment Booking
             </p>
-            <p className="text-lg text-blue-950">
+            <p className="text-blue-95 font-inter text-lg">
               Seize control of your health with decentralized IDs for a private,
               modern experience
             </p>
@@ -84,7 +84,7 @@ export default function Home() {
             <p className="text-3xl font-bold text-blue-900 2xl:text-5xl">
               Empowering Telehealth
             </p>
-            <p className="text-lg text-blue-950">
+            <p className="font-inter text-lg text-blue-950">
               Telehealth anywhere: Use your decentralized ID for secure medical
               expertise at home
             </p>
@@ -107,7 +107,7 @@ export default function Home() {
             <p className="text-3xl font-bold text-blue-900 2xl:text-5xl">
               Interconnected Health Records
             </p>
-            <p className="text-lg text-blue-950">
+            <p className="font-inter text-lg text-blue-950">
               Connected healthcare: ID links seamlessly with records for
               comprehensive information across providers.
             </p>
