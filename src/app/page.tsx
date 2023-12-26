@@ -29,8 +29,8 @@ export default function Home() {
           </div>
         </div>
       </div>
-      <div className="flex h-fit w-full flex-col gap-2 p-5 xl:flex-row">
-        <div className="rounded-3xl bg-pink-300 p-6 px-3 xl:h-[450px] xl:w-1/4">
+      <div className="flex h-fit w-full flex-col gap-5 p-5 xl:flex-row">
+        <div className="rounded-3xl bg-pink-300 p-6 px-3 duration-150 ease-in-out hover:scale-105 xl:h-[450px] xl:w-1/4">
           <div
             className="flex h-full w-full
            flex-col items-center justify-around space-y-7 text-center xl:space-x-0"
@@ -53,7 +53,7 @@ export default function Home() {
             </div>
           </div>
         </div>
-        <div className="rounded-3xl bg-yellow-400 p-6 px-3 xl:h-[450px] xl:w-1/4">
+        <div className="rounded-3xl bg-yellow-400 p-6 px-3 duration-150 ease-in-out hover:scale-105 xl:h-[450px] xl:w-1/4">
           <div
             className="flex h-full w-full
            flex-col items-center justify-around space-y-7 text-center xl:space-x-0"
@@ -76,7 +76,7 @@ export default function Home() {
             </div>
           </div>
         </div>
-        <div className="rounded-3xl bg-purple-300 p-6 px-3 xl:h-[450px] xl:w-1/4">
+        <div className="rounded-3xl bg-purple-300 p-6 px-3 duration-150 ease-in-out hover:scale-105 xl:h-[450px] xl:w-1/4">
           <div
             className="flex h-full w-full
            flex-col items-center justify-around space-y-7 text-center xl:space-x-0"
@@ -99,7 +99,7 @@ export default function Home() {
             </div>
           </div>
         </div>
-        <div className="rounded-3xl bg-red-300 p-6 px-3 xl:h-[450px] xl:w-1/4">
+        <div className="rounded-3xl bg-red-300 p-6 px-3 duration-150 ease-in-out hover:scale-105 xl:h-[450px] xl:w-1/4">
           <div
             className="flex h-full w-full
            flex-col items-center justify-around space-y-7 text-center xl:space-x-0"
