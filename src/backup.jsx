@@ -1,3 +1,4 @@
+/* eslint-disable no-use-before-define */
 <div className="flex h-full w-full flex-col space-y-4 rounded-xl">
   {/* navbar */}
   <div className="flex h-[10%] items-center justify-between rounded-xl bg-slate-50 pl-6 pr-5">
