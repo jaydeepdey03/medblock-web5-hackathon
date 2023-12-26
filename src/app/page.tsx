@@ -56,7 +56,7 @@ export default function Home() {
         <div className="xl:h-[450px] xl:w-1/4 px-3 bg-yellow-400 rounded-3xl p-6">
           <div
             className="flex flex-col justify-around
-           items-center text-center h-full w-full"
+           items-center text-center h-full w-full space-y-7 xl:space-x-0"
           >
             <p className="text-3xl 2xl:text-5xl font-bold text-blue-900">
               Seamless Appointment Booking
@@ -79,7 +79,7 @@ export default function Home() {
         <div className="xl:h-[450px] xl:w-1/4 px-3 bg-purple-300 rounded-3xl p-6">
           <div
             className="flex flex-col justify-around
-           items-center text-center h-full w-full"
+           items-center text-center h-full w-full space-y-7 xl:space-x-0"
           >
             <p className="text-3xl 2xl:text-5xl font-bold text-blue-900">
               Empowering Telehealth
@@ -102,7 +102,7 @@ export default function Home() {
         <div className="xl:h-[450px] xl:w-1/4 px-3 bg-red-300 rounded-3xl p-6">
           <div
             className="flex flex-col justify-around
-           items-center text-center h-full w-full"
+           items-center text-center h-full w-full space-y-7 xl:space-x-0"
           >
             <p className="text-3xl 2xl:text-5xl font-bold text-blue-900">
               Interconnected Health Records
