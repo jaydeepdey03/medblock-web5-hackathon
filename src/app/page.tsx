@@ -30,12 +30,12 @@ export default function Home() {
         </div>
       </div>
       <div className="p-5 flex gap-2 h-fit w-full flex-col xl:flex-row">
-        <div className="xl:h-[450px] xl:w-fit px-3 bg-pink-300 rounded-3xl p-6">
+        <div className="xl:h-[450px] xl:w-1/4 px-3 bg-pink-300 rounded-3xl p-6">
           <div
             className="flex flex-col justify-around
            items-center text-center h-full w-full space-y-7 xl:space-x-0"
           >
-            <p className="text-5xl font-bold text-blue-900">
+            <p className="text-3xl 2xl:text-5xl font-bold text-blue-900">
               Decentralized Patient IDs
             </p>
             <p className="text-lg text-blue-950">
@@ -53,12 +53,12 @@ export default function Home() {
             </div>
           </div>
         </div>
-        <div className="xl:h-[450px] xl:w-fit px-3 bg-yellow-400 rounded-3xl p-6">
+        <div className="xl:h-[450px] xl:w-1/4 px-3 bg-yellow-400 rounded-3xl p-6">
           <div
             className="flex flex-col justify-around
            items-center text-center h-full w-full"
           >
-            <p className="text-5xl font-bold text-blue-900">
+            <p className="text-3xl 2xl:text-5xl font-bold text-blue-900">
               Seamless Appointment Booking
             </p>
             <p className="text-lg text-blue-950">
@@ -76,12 +76,12 @@ export default function Home() {
             </div>
           </div>
         </div>
-        <div className="xl:h-[450px] xl:w-fit px-3 bg-purple-300 rounded-3xl p-6">
+        <div className="xl:h-[450px] xl:w-1/4 px-3 bg-purple-300 rounded-3xl p-6">
           <div
             className="flex flex-col justify-around
            items-center text-center h-full w-full"
           >
-            <p className="text-5xl font-bold text-blue-900">
+            <p className="text-3xl 2xl:text-5xl font-bold text-blue-900">
               Empowering Telehealth
             </p>
             <p className="text-lg text-blue-950">
@@ -99,12 +99,12 @@ export default function Home() {
             </div>
           </div>
         </div>
-        <div className="xl:sh-[450px] xl:sw-fit px-3 bg-red-300 rounded-3xl p-6">
+        <div className="xl:h-[450px] xl:w-1/4 px-3 bg-red-300 rounded-3xl p-6">
           <div
             className="flex flex-col justify-around
            items-center text-center h-full w-full"
           >
-            <p className="text-5xl font-bold text-blue-900">
+            <p className="text-3xl 2xl:text-5xl font-bold text-blue-900">
               Interconnected Health Records
             </p>
             <p className="text-lg text-blue-950">
