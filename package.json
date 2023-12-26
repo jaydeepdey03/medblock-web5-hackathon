@@ -11,8 +11,10 @@
   "dependencies": {
     "@radix-ui/react-dialog": "^1.0.5",
     "@radix-ui/react-slot": "^1.0.2",
+    "@web5/api": "^0.8.3",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
+    "crypto-browserify": "^3.12.0",
     "framer-motion": "^10.16.16",
     "lucide-react": "^0.302.0",
     "next": "14.0.4",
@@ -20,6 +22,7 @@
     "react": "^18",
     "react-dom": "^18",
     "react-icons": "^4.12.0",
+    "stream-browserify": "^3.0.0",
     "tailwind-merge": "^2.2.0",
     "tailwindcss-animate": "^1.0.7"
   },
