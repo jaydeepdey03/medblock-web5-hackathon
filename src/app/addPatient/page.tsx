@@ -88,7 +88,12 @@ export default function CreatePatient() {
                   Blood Group
                 </Label>
                 <div className="mb-2" />
-                <Select>
+                <Select
+                  onValueChange={(value) => {
+                    formik.setFieldValue("bloodGrp", value);
+                    // console.log(value);
+                  }}
+                >
                   <SelectTrigger className="">
                     <SelectValue placeholder="Select Blood Group" />
                   </SelectTrigger>
