@@ -77,3 +77,9 @@
     @apply bg-background text-foreground;
   }
 }
+
+
+.rti--container {
+  outline: none !important;
+  font-size: 14px;
+}
