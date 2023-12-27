@@ -4,12 +4,12 @@ import Image from "next/image";
 
 export default function Home() {
   return (
-    <div className="f h-screen min-h-screen w-screen p-5 font-poppins">
+    <div className="f h-screen min-h-screen w-full p-5 font-poppins">
       <div className="flex h-full w-full justify-center p-5 font-poppins">
         <div className="relative flex h-full w-full flex-col rounded-xl bg-blue-900 xl:flex-row">
           <div className="grid h-full w-full place-items-center rounded-xl ">
             <div className="flex flex-col items-center space-y-8 text-center xl:items-start">
-              <p className="text-8xl font-extrabold text-pink-200">MedBlock</p>
+              <p className="text-5xl font-extrabold text-pink-200 sm:text-8xl">MedBlock</p>
               <p className="text-xl font-semibold text-pink-100">
                 Your Decentralized Patient ID for Modern Appointments
               </p>
@@ -22,7 +22,7 @@ export default function Home() {
           <div className="relative flex h-full w-full items-center justify-center">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/doctor2.png"
+              src="https://img.freepik.com/free-vector/flat-national-doctor-s-day-illustration-with-female-medic_23-2149449714.jpg?w=740&t=st=1703664836~exp=1703665436~hmac=fcd8cc227be3c32f2ab52cc1a3869d5fc57b5f82b812cfef03191889b0f0100a"
               alt="doctor2"
               className="absolute h-full xl:bottom-0 xl:mt-auto xl:h-[80%]"
             />
@@ -35,7 +35,7 @@ export default function Home() {
             className="flex h-full w-full
            flex-col items-center justify-around space-y-7 text-center xl:space-x-0"
           >
-            <p className="text-3xl font-bold text-blue-900 2xl:text-5xl">
+            <p className="text-3xl font-bold text-blue-900 2xl:text-4xl">
               Decentralized Patient IDs
             </p>
             <p className="font-inter text-lg text-blue-950">
@@ -58,7 +58,7 @@ export default function Home() {
             className="flex h-full w-full
            flex-col items-center justify-around space-y-7 text-center xl:space-x-0"
           >
-            <p className="text-3xl font-bold text-blue-900 2xl:text-5xl">
+            <p className="text-3xl font-bold text-blue-900 2xl:text-4xl">
               Seamless Appointment Booking
             </p>
             <p className="text-blue-95 font-inter text-lg">
@@ -81,7 +81,7 @@ export default function Home() {
             className="flex h-full w-full
            flex-col items-center justify-around space-y-7 text-center xl:space-x-0"
           >
-            <p className="text-3xl font-bold text-blue-900 2xl:text-5xl">
+            <p className="text-3xl font-bold text-blue-900 2xl:text-4xl">
               Empowering Telehealth
             </p>
             <p className="font-inter text-lg text-blue-950">
@@ -104,7 +104,7 @@ export default function Home() {
             className="flex h-full w-full
            flex-col items-center justify-around space-y-7 text-center xl:space-x-0"
           >
-            <p className="text-3xl font-bold text-blue-900 2xl:text-5xl">
+            <p className="text-3xl font-bold text-blue-900 2xl:text-4xl">
               Interconnected Health Records
             </p>
             <p className="font-inter text-lg text-blue-950">

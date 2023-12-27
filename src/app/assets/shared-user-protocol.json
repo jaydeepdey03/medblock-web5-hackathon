@@ -6,7 +6,7 @@
       "schema": "https://didcomm.org/shared-todo/schemas/list.json",
       "dataFormats": ["application/json"]
     },
-    "todo": {
+    "appointment": {
       "schema": "https://didcomm.org/shared-todo/schemas/todo.json",
       "dataFormats": ["application/json"]
     }
@@ -23,7 +23,7 @@
           "can": "write"
         }
       ],
-      "todo": {
+      "appointment": {
         "$actions": [
           {
             "who": "author",
