@@ -1,43 +1,81 @@
 "use client"
-import protocolDefinition from "../assets/shared-user-protocol.json";
-import { Web5 } from "@web5/api";
+
 import { useEffect, useState } from "react";
+import useGlobalStore from '../../hook/useGlobalStore'
+import protocolDefinition from "../assets/shared-user-protocol.json";
 
 
 export default function Dashboard() {
 
+  const { web5, myDid } = useGlobalStore()
 
-  const [web5, setWeb5] = useState(null);
-  const [myDid, setMyDid] = useState(null);
+  const [sharedList, setSharedList] = useState([]);
+
 
   useEffect(() => {
-    const initWeb5 = async () => {
-      const { web5, did } = await Web5.connect();
-      console.log(did);
 
-      setWeb5(web5);
-      setMyDid(did);
 
-      if (web5 && did) {
-        await configureProtocol(web5, did);
-        //   await fetchDings(web5, did);
+    if (web5 && myDid) {
+      fetchList(web5, myDid);
+    }
+  }, [web5, myDid])
+
+
+  const [patient, setPatient] = useState({
+    name: 'Jaydeep',
+    dateOfBirth: '12-12-2012',
+    gender: 'male',
+    did: '---'
+  });
+
+  const fetchList = async (web5: any, did: string) => {
+
+    try {
+      console.log("Fetching list-------", web5)
+
+      const { records } = await web5.dwn.records.query({
+        message: {
+          filter: {
+            schema: protocolDefinition.types.list.schema,
+          },
+          dateSort: 'createdAscending'
+        }
+      });
+
+      console.log("Saved records", records);
+
+      // add entry to sharedList 
+      for (let record of records) {
+        const data = await record.data.json();
+        const list = { record, data, id: record.id };
+        // sharedList.value.push(list);
+        setSharedList([list, ...sharedList]);
       }
-    };
-    initWeb5();
-  }, []);
+
+    } catch (error) {
+      console.log("Failed ", error);
+    }
+  }
+
 
 
   const createSharedList = async () => {
-    let recipientDID = newTodo.value.recipientDID;
+
+    let recipientDID = 'xxx';
+
     const sharedListData = {
       "@type": "list",
-      "title": newTodo.value.title,
-      "description": newTodo.value.description,
-      "author": myDID,
-      "recipient": newTodo.value.recipientDID,
+      "name": patient.name,
+      "dateOfBirth": patient.dateOfBirth,
+      "gender": patient.gender,
+      "doctor": myDid,
+      "patient": recipientDID,
     }
 
-    newTodo.value = { title: '', description: '', recipientDID: '' }
+    // newTodo.value = { title: '', description: '', recipientDID: '' }
+    setPatient({
+      name: '', dateOfBirth: '', gender: '', did: ''
+    })
 
     try {
       const { record } = await web5.dwn.records.create({
@@ -54,8 +92,9 @@ export default function Dashboard() {
       const data = await record.data.json();
       const list = { record, data, id: record.id };
 
-      sharedList.value.push(list);
-      showForm.value = false
+      // sharedList.value.push(list);
+      setSharedList([list, ...sharedList]);
+      // showForm.value = false
 
       const { status: sendStatus } = await record.send(recipientDID);
 
@@ -72,37 +111,7 @@ export default function Dashboard() {
     }
   }
 
-  const configureProtocol = async () => {
-    // query the list of existing protocols on the DWN
-    const { protocols, status } = await web5.dwn.protocols.query({
-      message: {
-        filter: {
-          protocol: protocolDefinition.protocol,
-        }
-      }
-    });
 
-    if (status.code !== 200) {
-      alert('Error querying protocols');
-      console.error('Error querying protocols', status);
-      return;
-    }
-
-    // if the protocol already exists, we return
-    if (protocols.length > 0) {
-      console.log('Protocol already exists');
-      return;
-    }
-
-    // configure protocol on local DWN
-    const { status: configureStatus, protocol } = await web5.dwn.protocols.configure({
-      message: {
-        definition: protocolDefinition,
-      }
-    });
-
-    console.log('Protocol configured', configureStatus, protocol);
-  }
 
   return <div>Dashboard
 
