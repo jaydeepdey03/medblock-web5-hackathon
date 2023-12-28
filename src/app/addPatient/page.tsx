@@ -59,11 +59,17 @@ export default function CreatePatient() {
     }
   };
 
+  useEffect(() => {
+
+    sharedList.map((val, index) => {
+      console.log(val.id)
+    })
+  }, [sharedList])
+
+
   const createSharedList = async (patientDetails: any) => {
     let recipientDID = patientDetails.did;
 
-    // console.log(web5)
-    // console.log("Creating ", patientDetails);
 
     const sharedListData = {
       "@type": "list",
