@@ -60,16 +60,13 @@ export default function CreatePatient() {
   };
 
   useEffect(() => {
-
     sharedList.map((val, index) => {
-      console.log(val.id)
-    })
-  }, [sharedList])
-
+      console.log(val.id);
+    });
+  }, [sharedList]);
 
   const createSharedList = async (patientDetails: any) => {
     let recipientDID = patientDetails.did;
-
 
     const sharedListData = {
       "@type": "list",
@@ -82,7 +79,7 @@ export default function CreatePatient() {
       recipient: recipientDID,
     };
 
-    console.log(sharedListData)
+    console.log(sharedListData);
     try {
       const { record } = await web5.dwn.records.create({
         data: sharedListData,
@@ -116,10 +113,9 @@ export default function CreatePatient() {
     }
   };
 
-
   return (
     <div className="grid h-screen w-screen place-items-center p-10">
-      <div className="mb-10 flex h-fit w-[600px] flex-col rounded-xl border-[1px] shadow-lg xl:flex-row">
+      <div className="mb-10 flex h-fit w-[600px] flex-col rounded-xl border-[1px] shadow-2xl shadow-pink-100 xl:flex-row">
         <Formik
           initialValues={{
             name: "" as string,
@@ -129,11 +125,29 @@ export default function CreatePatient() {
             height: "",
             weight: "",
           }}
-          onSubmit={(values, _) => createSharedList(values)}
+          onSubmit={(values, _) => {
+            createSharedList(values);
+            router.push(`/patientDashboard/did:ion:id=${values.did.slice(-8)}`);
+          }}
         >
           {(formik) => (
             <Form className="flex w-full flex-col items-center space-y-5 p-10">
-              <p className="text-3xl font-bold text-blue-800">Add Patient</p>
+              <p className="text-3xl font-bold text-blue-800">
+                MedBlock Patient Details
+              </p>
+              <div className="w-full">
+                <Label htmlFor="did" className="ml-1">
+                  DID
+                </Label>
+                <Field
+                  name="did"
+                  as={Input}
+                  placeholder="DID"
+                  type="text"
+                  className="mt-2"
+                />
+              </div>
+
               <div className="w-full">
                 <Label htmlFor="name" className="ml-1">
                   Name
@@ -209,25 +223,13 @@ export default function CreatePatient() {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="w-full">
-                <Label htmlFor="did" className="ml-1">
-                  DID
-                </Label>
-                <Field
-                  name="did"
-                  as={Input}
-                  placeholder="DID"
-                  type="text"
-                  className="mt-2"
-                />
-              </div>
 
               <div className="w-full">
                 <Button
                   type="submit"
                   className="group flex w-full items-center justify-center bg-blue-800 hover:bg-blue-900"
                 >
-                  <p className="text-white">Submit</p>
+                  <p className="text-white">Add Patient</p>
                   <ArrowRight className="ml-2 h-4 w-4 duration-100 ease-in-out group-hover:translate-x-1" />
                 </Button>
               </div>

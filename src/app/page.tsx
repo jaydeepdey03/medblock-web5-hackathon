@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 export default function Home() {
   const router = useRouter();
   return (
-    <div className="h-screen min-h-screen w-full p-5 font-poppins">
+    <div className="h-screen min-h-screen w-full font-poppins">
       <div className="flex h-full w-full justify-center p-5 font-poppins">
         <div className="relative flex h-full w-full flex-col rounded-xl bg-blue-900 xl:flex-row">
           <div className="grid h-full w-full place-items-center rounded-xl ">
@@ -15,7 +15,7 @@ export default function Home() {
               <p className="text-5xl font-extrabold text-pink-200 sm:text-8xl">
                 MedBlock
               </p>
-              <p className="text-xl font-semibold text-pink-100">
+              <p className="text-md px-4 font-semibold text-pink-100 sm:text-xl">
                 Your Decentralized Patient ID for Modern Appointments
               </p>
               <Button
