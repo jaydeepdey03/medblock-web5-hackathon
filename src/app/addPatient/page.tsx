@@ -14,22 +14,116 @@ import { Field, Form, Formik } from "formik";
 import { ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { TagsInput } from "react-tag-input-component";
+
+import useGlobalStore from "../../hook/useGlobalStore";
+import protocolDefinition from "../../assets/shared-user-protocol.json";
+import { useEffect, useState } from "react";
+
 export default function CreatePatient() {
   const router = useRouter();
+  const { web5, myDid } = useGlobalStore();
+
+  const [sharedList, setSharedList] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (web5 && myDid) {
+      fetchList(web5, myDid);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [web5, myDid]);
+
+  const fetchList = async (web5: any, did: string) => {
+    try {
+      console.log("Fetching list-------", web5);
+
+      const { records } = await web5.dwn.records.query({
+        message: {
+          filter: {
+            schema: protocolDefinition.types.list.schema,
+          },
+          dateSort: "createdAscending",
+        },
+      });
+
+      console.log("Saved records", records);
+
+      // add entry to sharedList
+      for (let record of records) {
+        const data = await record.data.json();
+        const list = { record, data, id: record.id };
+        // sharedList.value.push(list);
+        setSharedList([list, ...sharedList]);
+      }
+    } catch (error) {
+      console.log("Failed ", error);
+    }
+  };
+
+  const createSharedList = async (patientDetails: any) => {
+    let recipientDID = patientDetails.did;
+
+    // console.log(web5)
+    // console.log("Creating ", patientDetails);
+
+    const sharedListData = {
+      "@type": "list",
+      author: myDid,
+      name: patientDetails.name,
+      age: patientDetails.age,
+      height: patientDetails.height,
+      weight: patientDetails.weight,
+      bloodGrp: patientDetails.bloodGrp,
+      recipient: recipientDID,
+    };
+
+    console.log(sharedListData)
+    try {
+      const { record } = await web5.dwn.records.create({
+        data: sharedListData,
+        message: {
+          protocol: protocolDefinition.protocol,
+          protocolPath: "list",
+          schema: protocolDefinition.types.list.schema,
+          dataFormat: protocolDefinition.types.list.dataFormats[0],
+          recipient: recipientDID,
+        },
+      });
+
+      const data = await record.data.json();
+      const list = { record, data, id: record.id };
+
+      // sharedList.value.push(list);
+      setSharedList([list, ...sharedList]);
+      // showForm.value = false
+
+      const { status: sendStatus } = await record.send(recipientDID);
+
+      if (sendStatus.code !== 202) {
+        console.log("Unable to send to target did:" + sendStatus);
+        return;
+      } else {
+        console.log("Shared list sent to recipient");
+      }
+    } catch (e) {
+      console.error(e);
+      return;
+    }
+  };
+
+
   return (
     <div className="grid h-screen w-screen place-items-center p-10">
       <div className="mb-10 flex h-fit w-[600px] flex-col rounded-xl border-[1px] shadow-lg xl:flex-row">
         <Formik
           initialValues={{
-            name: "" as String,
-            age: "" as String,
-            allergyHis: [] as string[],
-            bloodGrp: "" as String,
-            pastCondition: "",
+            name: "" as string,
+            age: "" as string,
+            bloodGrp: "" as string,
+            did: "" as string,
             height: "",
             weight: "",
           }}
-          onSubmit={(values, _) => console.log(values)}
+          onSubmit={(values, _) => createSharedList(values)}
         >
           {(formik) => (
             <Form className="flex w-full flex-col items-center space-y-5 p-10">
@@ -98,43 +192,25 @@ export default function CreatePatient() {
                     <SelectValue placeholder="Select Blood Group" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="a-">A Negative</SelectItem>
-                    <SelectItem value="a+">A Positive</SelectItem>
-                    <SelectItem value="b+">B Positive</SelectItem>
-                    <SelectItem value="b-">B Negative</SelectItem>
-                    <SelectItem value="o+">O Positive</SelectItem>
-                    <SelectItem value="o-">O Negative</SelectItem>
-                    <SelectItem value="ab+">AB Positive</SelectItem>
-                    <SelectItem value="ab-">AB Negative</SelectItem>
+                    <SelectItem value="a-">A-</SelectItem>
+                    <SelectItem value="a+">A+</SelectItem>
+                    <SelectItem value="b+">B+</SelectItem>
+                    <SelectItem value="b-">B-</SelectItem>
+                    <SelectItem value="o+">O+</SelectItem>
+                    <SelectItem value="o-">O-</SelectItem>
+                    <SelectItem value="ab+">AB+</SelectItem>
+                    <SelectItem value="ab-">AB-</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="w-full">
-                <Label htmlFor="allergyHis" className="ml-1">
-                  Allgery History
-                </Label>
-                <div className="mb-2" />
-                <TagsInput
-                  classNames={{
-                    input: "",
-                    tag: "bg-blue-200 text-blue-700",
-                  }}
-                  value={formik.values.allergyHis}
-                  onChange={(newAllergies) => {
-                    formik.setFieldValue("allergyHis", newAllergies);
-                  }}
-                  name="allergyHis"
-                  placeHolder="Type disease and Press Enter"
-                />
-              </div>
-              <div className="w-full">
-                <Label htmlFor="pastCondition" className="ml-1">
-                  Past Condition
+                <Label htmlFor="did" className="ml-1">
+                  DID
                 </Label>
                 <Field
-                  name="pastCondition"
+                  name="did"
                   as={Input}
-                  placeholder="Please specify any past condition"
+                  placeholder="DID"
                   type="text"
                   className="mt-2"
                 />
@@ -145,7 +221,7 @@ export default function CreatePatient() {
                   type="submit"
                   className="group flex w-full items-center justify-center bg-blue-800 hover:bg-blue-900"
                 >
-                  <p className="text-white">Generate DID and Add Patient</p>
+                  <p className="text-white">Submit</p>
                   <ArrowRight className="ml-2 h-4 w-4 duration-100 ease-in-out group-hover:translate-x-1" />
                 </Button>
               </div>

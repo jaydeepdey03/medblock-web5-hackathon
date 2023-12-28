@@ -1,13 +1,13 @@
 {
-  "protocol": "https://didcomm.org/shared-todo",
+  "protocol": "https://didcomm.org/shared-user-protocol",
   "published": true,
   "types": {
     "list": {
-      "schema": "https://didcomm.org/shared-todo/schemas/list.json",
+      "schema": "https://didcomm.org/shared-user-protocol/schemas/list.json",
       "dataFormats": ["application/json"]
     },
-    "todo": {
-      "schema": "https://didcomm.org/shared-todo/schemas/todo.json",
+    "appointment": {
+      "schema": "https://didcomm.org/shared-user-protocol/schemas/appointment.json",
       "dataFormats": ["application/json"]
     }
   },
@@ -23,7 +23,7 @@
           "can": "write"
         }
       ],
-      "todo": {
+      "appointment": {
         "$actions": [
           {
             "who": "author",
@@ -33,7 +33,7 @@
           {
             "who": "recipient",
             "of": "list",
-            "can": "write"
+            "can": "read"
           }
         ]
       }

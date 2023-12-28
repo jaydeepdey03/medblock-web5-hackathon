@@ -1,6 +1,6 @@
 "use client";
 import { createContext, ReactNode, useState, useEffect } from "react";
-import protocolDefinition from "../app/assets/shared-user-protocol.json";
+import protocolDefinition from "../assets/shared-user-protocol.json";
 import { Web5 } from "@web5/api";
 
 export const DIDContext = createContext({} as any);
@@ -12,28 +12,28 @@ export default function DIDContextProvider({
   const [web5, setWeb5] = useState(null);
   const [myDid, setMyDid] = useState(null);
 
-  //   useEffect(() => {
-  //     const initWeb5 = async () => {
-  //       const { web5, did } = await Web5.connect();
-  //       console.log(did);
+  useEffect(() => {
+    const initWeb5 = async () => {
+      const { web5, did } = await Web5.connect();
+      console.log(did);
 
-  //       setWeb5(web5);
-  //       setMyDid(did);
+      setWeb5(web5);
+      setMyDid(did);
 
-  //       if (web5 && did) {
-  //         await configureProtocol(web5, did);
-  //         console.log(did, web5, "-------");
-  //       }
-  //     };
-  //     initWeb5();
-  //   }, []);
+      if (web5 && did) {
+        await configureProtocol(web5, did);
+        // console.log(did, web5, "-------");
+      }
+    };
+    initWeb5();
+  }, []);
 
   const queryForProtocol = async (web5: any) => {
     try {
       return await web5.dwn.protocols.query({
         message: {
           filter: {
-            protocol: "https://blackgirlbytes.dev/dinger-chat-protocol",
+            protocol: "https://didcomm.org/shared-user-protocol",
           },
         },
       });
