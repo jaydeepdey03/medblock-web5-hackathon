@@ -20,7 +20,7 @@ export default function Home() {
               </p>
               <Button
                 className="group flex w-[200px] space-x-2 rounded-full bg-pink-400 hover:bg-pink-500"
-                onClick={() => router.push("/addPatient")}
+                onClick={() => router.push("/dashboard")}
               >
                 <span>Add Patient ID</span>
                 <ArrowRight className="mr-2 h-4 w-4 duration-200 ease-in-out group-hover:translate-x-1" />

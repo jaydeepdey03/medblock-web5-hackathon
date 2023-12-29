@@ -135,18 +135,21 @@ function Appointment({ params }: { params: { id: string } }) {
         Add Appointment
       </button> */}
       <div className="flex h-full w-full flex-col gap-3">
-        <div className="h-[40%] w-full rounded-2xl bg-gray-200"></div>
-        <div className="flex h-[60%] w-full flex-col gap-5 overflow-hidden rounded-2xl md:flex-row">
-          <Card className="card-scroll col-span-3 w-full md:w-1/2">
+        <div className="h-[50%] w-full rounded-2xl bg-gray-200"></div>
+        <div className="flex h-[40%] w-full flex-col gap-5 rounded-2xl md:flex-row">
+          <Card className="card-scroll col-span-3 h-fit w-full md:w-1/2">
             <CardHeader>
               <CardTitle>Appointment</CardTitle>
               {/* <CardDescription>You made 265 sales this month.</CardDescription> */}
             </CardHeader>
             <div className="card-scroll h-full w-full overflow-y-scroll">
               <CardContent className="">
-                <div className="space-y-8">
+                <div className="space-y-2">
                   {[1, 2, 3, 4, 5, 6, 7, 8].map((item) => (
-                    <div className="flex items-center" key={item}>
+                    <div
+                      className="flex items-center rounded-xl p-5 hover:bg-slate-100"
+                      key={item}
+                    >
                       <Avatar className="h-9 w-9">
                         <AvatarImage src="/avatars/01.png" alt="Avatar" />
                         <AvatarFallback>OM</AvatarFallback>
@@ -194,9 +197,12 @@ function Appointment({ params }: { params: { id: string } }) {
             </CardHeader>
             <div className="card-scroll h-full w-full overflow-y-scroll">
               <CardContent className="">
-                <div className="space-y-8">
+                <div className="space-y-2">
                   {[1, 2, 3, 4, 5, 6, 7, 8].map((item) => (
-                    <div className="flex items-center" key={item}>
+                    <div
+                      className="flex items-center rounded-xl p-5 hover:bg-slate-100"
+                      key={item}
+                    >
                       <Avatar className="h-9 w-9">
                         <AvatarImage src="/avatars/01.png" alt="Avatar" />
                         <AvatarFallback>OM</AvatarFallback>
