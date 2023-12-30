@@ -25,9 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import Fuse from 'fuse.js';
-
-
+import Fuse from "fuse.js";
 
 export default function Dashboard() {
   const { web5, myDid } = useGlobalStore();
@@ -37,14 +35,12 @@ export default function Dashboard() {
   const [open, setOpen] = useState<boolean>(false);
   const [searchPattern, setSearchPattern] = useState<string>("");
   const fuse = new Fuse(patients, {
-    keys: [
-      'name'
-    ]
+    keys: ["name"],
   });
 
   useEffect(() => {
     if (web5 && myDid) {
-      console.log('number of callss---------')
+      console.log("number of callss---------");
       fetchList(web5, myDid);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -73,7 +69,7 @@ export default function Dashboard() {
 
         // console.log("Added record", list);
         // // add to existing state of the patient
-        if (!patientsArray.some(item => item.id === list.id)) {
+        if (!patientsArray.some((item) => item.id === list.id)) {
           patientsArray.push(list);
         }
         // setPatients((prev) => [list, ...prev]);
@@ -139,11 +135,9 @@ export default function Dashboard() {
     }
   };
 
-
   useEffect(() => {
-    console.log('patientsssss----  ', patients)
-  }, [patients])
-
+    console.log("patientsssss----  ", patients);
+  }, [patients]);
 
   return (
     <div className="relative flex h-full w-full flex-col gap-2 p-5">
@@ -305,7 +299,12 @@ export default function Dashboard() {
         List of Patient
       </p>
       <div className="flex justify-end px-10 py-4">
-        <Input type="text" placeholder="Name" value={searchPattern} onChange={(e) => setSearchPattern(e.target.value)} />
+        <Input
+          type="text"
+          placeholder="Name"
+          value={searchPattern}
+          onChange={(e) => setSearchPattern(e.target.value)}
+        />
 
         <Button
           className="w-fit bg-blue-800 hover:bg-blue-900"
@@ -317,17 +316,21 @@ export default function Dashboard() {
 
       <div
         className="grid h-full w-full place-items-center gap-4 px-10"
-        style={{ gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))" }}
+        style={{
+          gridTemplateColumns: `repeat(auto-${
+            patients.length <= 1 ? "fit" : "fill"
+          }, minmax(400px, 1fr))`,
+        }}
       >
-        {fuse.search(searchPattern).length === 0
-          && patients.map((patient, i) => (
+        {fuse.search(searchPattern).length === 0 &&
+          patients.map((patient, i) => (
             <div
-              className="ease ull flex h-fit cursor-pointer flex-col rounded-xl border border-slate-200 bg-white p-5 duration-100 hover:scale-105"
-              style={{ width: "100%" }} // Set width to 100%
+              className="flex h-fit w-full cursor-pointer flex-col rounded-xl border border-slate-200 bg-white p-5 duration-100 hover:scale-105"
+              // style={{ width: "100%" }} // Set width to 100%
               key={i}
             >
               <div className="flex items-center gap-2">
-
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={`/${patient.gender === "male" ? "boy" : "girl"}.png`}
                   alt="doctor"
@@ -340,8 +343,7 @@ export default function Dashboard() {
               </div>
               <div className="flex flex-col gap-2 py-3">
                 <p className="truncate text-sm">
-                  <span className="font-medium">Doctor:</span>{" "}
-                  {patient.author}
+                  <span className="font-medium">Doctor:</span> {patient.author}
                 </p>
                 <p className="truncate text-sm">
                   <span className="font-medium">Patient:</span>{" "}
@@ -353,27 +355,24 @@ export default function Dashboard() {
                   {patient.bloodGrp?.toUpperCase()}
                 </p>
                 <p className="truncate text-sm">
-                  <span className="font-medium">Height:</span>{" "}
-                  {patient.height}
+                  <span className="font-medium">Height:</span> {patient.height}
                 </p>
                 <p className="truncate text-sm">
-                  <span className="font-medium">Weight:</span>{" "}
-                  {patient.weight}
+                  <span className="font-medium">Weight:</span> {patient.weight}
                 </p>
               </div>
             </div>
-          ))
-        }
+          ))}
         {/* If not searching  */}
-        {fuse.search(searchPattern).length > 0
-          && fuse.search(searchPattern)?.map(({ item: patient }, i) => (
+        {fuse.search(searchPattern).length > 0 &&
+          fuse.search(searchPattern)?.map(({ item: patient }, i) => (
             <div
-              className="ease ull flex h-fit cursor-pointer flex-col rounded-xl border border-slate-200 bg-white p-5 duration-100 hover:scale-105"
+              className="flex h-fit cursor-pointer flex-col rounded-xl border border-slate-200 bg-white p-5 duration-100 hover:scale-105"
               style={{ width: "100%" }} // Set width to 100%
               key={i}
             >
               <div className="flex items-center gap-2">
-
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={`/${patient.gender === "male" ? "boy" : "girl"}.png`}
                   alt="doctor"
@@ -386,8 +385,7 @@ export default function Dashboard() {
               </div>
               <div className="flex flex-col gap-2 py-3">
                 <p className="truncate text-sm">
-                  <span className="font-medium">Doctor:</span>{" "}
-                  {patient.author}
+                  <span className="font-medium">Doctor:</span> {patient.author}
                 </p>
                 <p className="truncate text-sm">
                   <span className="font-medium">Patient:</span>{" "}
@@ -399,19 +397,15 @@ export default function Dashboard() {
                   {patient.bloodGrp?.toUpperCase()}
                 </p>
                 <p className="truncate text-sm">
-                  <span className="font-medium">Height:</span>{" "}
-                  {patient.height}
+                  <span className="font-medium">Height:</span> {patient.height}
                 </p>
                 <p className="truncate text-sm">
-                  <span className="font-medium">Weight:</span>{" "}
-                  {patient.weight}
+                  <span className="font-medium">Weight:</span> {patient.weight}
                 </p>
               </div>
             </div>
-          ))
-        }
-
-      </div >
-    </div >
+          ))}
+      </div>
+    </div>
   );
 }
