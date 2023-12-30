@@ -35,7 +35,7 @@ export default function PatientDashboard({
         </div>
       </div>
       <div className="grid grid-flow-row grid-cols-1 gap-4 p-8 xl:grid-cols-3 xl:grid-rows-3">
-        <Card className="col-span-3 col-start-1 col-end-2 row-span-full h-fit w-full sm:px-5">
+        <Card className="order-last col-start-1 col-end-2 row-span-full flex h-fit w-full flex-col sm:px-5">
           <CardHeader>
             <CardTitle>All Appointment</CardTitle>
           </CardHeader>
@@ -44,7 +44,7 @@ export default function PatientDashboard({
               <div className="space-y-2">
                 {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14].map((item) => (
                   <div
-                    className="flex items-center rounded-xl pr-4 hover:bg-slate-100"
+                    className="flex items-center rounded-xl px-3 hover:bg-slate-100"
                     key={item}
                   >
                     <div className="flex items-center gap-0 truncate sm:w-[70%]">
@@ -90,7 +90,7 @@ export default function PatientDashboard({
             </CardContent>
           </div>
         </Card>
-        <div className="grid h-[500px] w-full grid-cols-1 gap-2 rounded-xl xl:col-span-full xl:col-start-2 xl:col-end-4 xl:row-start-1 xl:row-end-2 xl:h-full xl:grid-cols-3">
+        <div className="order-first grid h-[500px] w-full grid-cols-1 gap-2 rounded-xl xl:col-span-full xl:col-start-2 xl:col-end-4 xl:row-start-1 xl:row-end-2 xl:h-full xl:grid-cols-3">
           <div className="flex h-full w-full flex-col items-center justify-center space-y-6 rounded-xl border-[1px] border-slate-200 bg-white">
             <Ruler className="h-[50px] w-[50px] text-slate-700" />
             <p className="text-lg font-medium">Height</p>
@@ -104,17 +104,17 @@ export default function PatientDashboard({
             <p className="text-lg font-medium">Blood Group</p>
           </div>
         </div>
-        <div className="h-full w-full overflow-hidden rounded-xl bg-pink-300 xl:col-start-2 xl:col-end-4 xl:row-start-2 xl:row-end-4">
+        <div className="order-2 h-full w-full overflow-hidden rounded-xl bg-pink-300 xl:col-start-2 xl:col-end-4 xl:row-start-2 xl:row-end-4">
           <Card className="h-full">
             <CardHeader>
-              <CardTitle>All Appointment</CardTitle>
+              <CardTitle>My Appointment</CardTitle>
             </CardHeader>
             <div className="card-scroll h-[500px] w-full overflow-y-scroll">
               <CardContent className="overflow-hidden">
                 <div className="space-y-2">
                   {[1, 2, 3, 4, 5, 6, 9, 10, 11, 12, 13, 14].map((item) => (
                     <div
-                      className="flex items-center rounded-xl pr-4 hover:bg-slate-100"
+                      className="flex items-center rounded-xl px-3 hover:bg-slate-100"
                       key={item}
                     >
                       <div className="flex items-center gap-0 truncate sm:w-[70%]">
