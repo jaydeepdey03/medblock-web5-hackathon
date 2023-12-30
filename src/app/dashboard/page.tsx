@@ -25,6 +25,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import Fuse from 'fuse.js';
+
+
 
 export default function Dashboard() {
   const { web5, myDid } = useGlobalStore();
@@ -32,9 +35,16 @@ export default function Dashboard() {
   const [patients, setPatients] = useState<any[]>([]);
   const router = useRouter();
   const [open, setOpen] = useState<boolean>(false);
+  const [searchPattern, setSearchPattern] = useState<string>("");
+  const fuse = new Fuse(patients, {
+    keys: [
+      'name'
+    ]
+  });
 
   useEffect(() => {
     if (web5 && myDid) {
+      console.log('number of callss---------')
       fetchList(web5, myDid);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -56,13 +66,18 @@ export default function Dashboard() {
       console.log("Saved records", records);
 
       // add entry to sharedList
+      let patientsArray: any[] = [];
       for (let record of records) {
         const data = await record.data.json();
-        const list = { record, data, id: record.id };
-        // sharedList.value.push(list);
+        const list = { record, ...data, id: record.id };
 
-        // add to existing state of the patient
-        setPatients((prev) => [list, ...prev]);
+        // console.log("Added record", list);
+        // // add to existing state of the patient
+        if (!patientsArray.some(item => item.id === list.id)) {
+          patientsArray.push(list);
+        }
+        // setPatients((prev) => [list, ...prev]);
+        setPatients(patientsArray);
       }
     } catch (error) {
       console.log("Failed ", error);
@@ -104,7 +119,7 @@ export default function Dashboard() {
       });
 
       const data = await record.data.json();
-      const list = { record, data, id: record.id };
+      const list = { record, ...data, id: record.id };
 
       // sharedList.value.push(list);
       setPatients([list, ...patients]);
@@ -123,6 +138,12 @@ export default function Dashboard() {
       return;
     }
   };
+
+
+  useEffect(() => {
+    console.log('patientsssss----  ', patients)
+  }, [patients])
+
 
   return (
     <div className="relative flex h-full w-full flex-col gap-2 p-5">
@@ -284,6 +305,8 @@ export default function Dashboard() {
         List of Patient
       </p>
       <div className="flex justify-end px-10 py-4">
+        <Input type="text" placeholder="Name" value={searchPattern} onChange={(e) => setSearchPattern(e.target.value)} />
+
         <Button
           className="w-fit bg-blue-800 hover:bg-blue-900"
           onClick={() => setOpen((prev) => !prev)}
@@ -296,92 +319,99 @@ export default function Dashboard() {
         className="grid h-full w-full place-items-center gap-4 px-10"
         style={{ gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))" }}
       >
-        {patients.map((patient, i) => (
-          <div
-            className="ease ull flex h-fit cursor-pointer flex-col rounded-xl border border-slate-200 bg-white p-5 duration-100 hover:scale-105"
-            style={{ width: "100%" }} // Set width to 100%
-            key={i}
-          >
-            <div className="flex items-center gap-2">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={`/${patient.data.gender === "male" ? "boy" : "girl"}.png`}
-                alt="doctor"
-                className="h-9 w-9"
-              />
-              <div className="flex flex-col">
-                <p className="text-sm capitalize">{patient.data.name}</p>
-                <p className="text-xs capitalize">{patient.data.gender}</p>
+        {fuse.search(searchPattern).length === 0
+          && patients.map((patient, i) => (
+            <div
+              className="ease ull flex h-fit cursor-pointer flex-col rounded-xl border border-slate-200 bg-white p-5 duration-100 hover:scale-105"
+              style={{ width: "100%" }} // Set width to 100%
+              key={i}
+            >
+              <div className="flex items-center gap-2">
+
+                <img
+                  src={`/${patient.gender === "male" ? "boy" : "girl"}.png`}
+                  alt="doctor"
+                  className="h-9 w-9"
+                />
+                <div className="flex flex-col">
+                  <p className="text-sm capitalize">{patient.name}</p>
+                  <p className="text-xs capitalize">{patient.gender}</p>
+                </div>
+              </div>
+              <div className="flex flex-col gap-2 py-3">
+                <p className="truncate text-sm">
+                  <span className="font-medium">Doctor:</span>{" "}
+                  {patient.author}
+                </p>
+                <p className="truncate text-sm">
+                  <span className="font-medium">Patient:</span>{" "}
+                  {patient.recipient}
+                </p>
+                <p className="truncate text-sm">
+                  <span className="font-medium">Blood Group:&nbsp;</span>
+
+                  {patient.bloodGrp?.toUpperCase()}
+                </p>
+                <p className="truncate text-sm">
+                  <span className="font-medium">Height:</span>{" "}
+                  {patient.height}
+                </p>
+                <p className="truncate text-sm">
+                  <span className="font-medium">Weight:</span>{" "}
+                  {patient.weight}
+                </p>
               </div>
             </div>
-            <div className="flex flex-col gap-2 py-3">
-              <p className="truncate text-sm">
-                <span className="font-medium">Doctor:</span>{" "}
-                {patient.data.author}
-              </p>
-              <p className="truncate text-sm">
-                <span className="font-medium">Patient:</span>{" "}
-                {patient.data.recipient}
-              </p>
-              <p className="truncate text-sm">
-                <span className="font-medium">Blood Group:&nbsp;</span>
+          ))
+        }
+        {/* If not searching  */}
+        {fuse.search(searchPattern).length > 0
+          && fuse.search(searchPattern)?.map(({ item: patient }, i) => (
+            <div
+              className="ease ull flex h-fit cursor-pointer flex-col rounded-xl border border-slate-200 bg-white p-5 duration-100 hover:scale-105"
+              style={{ width: "100%" }} // Set width to 100%
+              key={i}
+            >
+              <div className="flex items-center gap-2">
 
-                {patient.data.bloodGrp.toUpperCase()}
-              </p>
-              <p className="truncate text-sm">
-                <span className="font-medium">Height:</span>{" "}
-                {patient.data.height}
-              </p>
-              <p className="truncate text-sm">
-                <span className="font-medium">Weight:</span>{" "}
-                {patient.data.weight}
-              </p>
-            </div>
-          </div>
-        ))}
-        {/* {Array.from({ length: 10 }).map((_, index) => (
-          <div
-            className="ease flex h-full cursor-pointer flex-col rounded-xl border border-slate-200 bg-white p-5 duration-100 hover:scale-105"
-            style={{ width: "100%" }} 
-            key={index}
-          >
-            <div className="flex items-center gap-2">
-              <img
-                src={`/${"male" === "male" ? "boy" : "girl"}.png`}
-                alt="doctor"
-                className="h-9 w-9"
-              />
-              <div className="flex flex-col">
-                <p className="text-sm capitalize">{"patient.data.name"}</p>
-                <p className="text-xs capitalize">{"patient.data.gender"}</p>
+                <img
+                  src={`/${patient.gender === "male" ? "boy" : "girl"}.png`}
+                  alt="doctor"
+                  className="h-9 w-9"
+                />
+                <div className="flex flex-col">
+                  <p className="text-sm capitalize">{patient.name}</p>
+                  <p className="text-xs capitalize">{patient.gender}</p>
+                </div>
+              </div>
+              <div className="flex flex-col gap-2 py-3">
+                <p className="truncate text-sm">
+                  <span className="font-medium">Doctor:</span>{" "}
+                  {patient.author}
+                </p>
+                <p className="truncate text-sm">
+                  <span className="font-medium">Patient:</span>{" "}
+                  {patient.recipient}
+                </p>
+                <p className="truncate text-sm">
+                  <span className="font-medium">Blood Group:&nbsp;</span>
+
+                  {patient.bloodGrp?.toUpperCase()}
+                </p>
+                <p className="truncate text-sm">
+                  <span className="font-medium">Height:</span>{" "}
+                  {patient.height}
+                </p>
+                <p className="truncate text-sm">
+                  <span className="font-medium">Weight:</span>{" "}
+                  {patient.weight}
+                </p>
               </div>
             </div>
-            <div className="flex flex-col gap-2 py-3">
-              <p className="truncate text-sm">
-                <span className="font-medium">Doctor:</span>{" "}
-                {"patient.data.author"}
-              </p>
-              <p className="truncate text-sm">
-                <span className="font-medium">Patient:</span>{" "}
-                {"patient.data.recipient"}
-              </p>
-              <p className="truncate text-sm">
-                <span className="font-medium">Blood Group:&nbsp;</span>
+          ))
+        }
 
-                {"patient.data.bloodGrp.toUpperCase()"}
-              </p>
-              <p className="truncate text-sm">
-                <span className="font-medium">Height:</span>{" "}
-                {"patient.data.height"}
-              </p>
-              <p className="truncate text-sm">
-                <span className="font-medium">Weight:</span>{" "}
-                {"patient.data.weight"}
-              </p>
-            </div>
-          </div>
-        ))} */}
-      </div>
-    </div>
+      </div >
+    </div >
   );
 }
