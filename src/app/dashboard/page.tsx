@@ -39,14 +39,14 @@ export default function Dashboard() {
   });
 
   useEffect(() => {
-    if (web5 && myDid) {
+    if (web5) {
       console.log("number of callss---------");
-      fetchList(web5, myDid);
+      fetchList(web5);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [web5, myDid]);
+  }, [web5]);
 
-  const fetchList = async (web5: any, did: string) => {
+  const fetchList = async (web5: any) => {
     try {
       console.log("Fetching list-------", web5);
 
@@ -73,18 +73,14 @@ export default function Dashboard() {
           patientsArray.push(list);
         }
         // setPatients((prev) => [list, ...prev]);
-        setPatients(patientsArray);
+        console.log("Updated records", patientsArray);
+        if (patientsArray.length !== patients.length)
+          setPatients(patientsArray);
       }
     } catch (error) {
       console.log("Failed ", error);
     }
   };
-
-  useEffect(() => {
-    patients.map((val, index) => {
-      console.log(val);
-    });
-  }, [patients]);
 
   const addNewPatient = async (patientDetails: any) => {
     let recipientDID = patientDetails.did;
@@ -298,12 +294,13 @@ export default function Dashboard() {
       <p className="mb-6 py-5 text-center font-inter text-4xl font-bold text-blue-900">
         List of Patient
       </p>
-      <div className="flex justify-end px-10 py-4">
+      <div className="flex justify-between space-x-2 px-10 py-4">
         <Input
           type="text"
           placeholder="Name"
           value={searchPattern}
           onChange={(e) => setSearchPattern(e.target.value)}
+          className="focus-visible:ring-2 focus-visible:ring-blue-800 focus-visible:ring-opacity-50"
         />
 
         <Button
@@ -317,17 +314,17 @@ export default function Dashboard() {
       <div
         className="grid h-full w-full place-items-center gap-4 px-10"
         style={{
-          gridTemplateColumns: `repeat(auto-${
-            patients.length <= 1 ? "fit" : "fill"
-          }, minmax(400px, 1fr))`,
+          gridTemplateColumns: `repeat(auto-${patients.length <= 1 ? "fit" : "fill"
+            }, minmax(400px, 1fr))`,
         }}
       >
-        {fuse.search(searchPattern).length === 0 &&
+        {searchPattern.length === 0 &&
           patients.map((patient, i) => (
             <div
               className="flex h-fit w-full cursor-pointer flex-col rounded-xl border border-slate-200 bg-white p-5 duration-100 hover:scale-105"
               // style={{ width: "100%" }} // Set width to 100%
               key={i}
+              onClick={() => router.push(`/patientDashboard/${patient.id}`)}
             >
               <div className="flex items-center gap-2">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -337,17 +334,17 @@ export default function Dashboard() {
                   className="h-9 w-9"
                 />
                 <div className="flex flex-col">
-                  <p className="text-sm capitalize">{patient.name}</p>
+                  <p className="text-sm capitalize">{patient.name} {searchPattern.length}{patients.length}</p>
                   <p className="text-xs capitalize">{patient.gender}</p>
                 </div>
               </div>
               <div className="flex flex-col gap-2 py-3">
                 <p className="truncate text-sm">
-                  <span className="font-medium">Doctor:</span> {patient.author}
+                  <span className="font-medium">Doctor:</span> {patient.author + "..."}
                 </p>
                 <p className="truncate text-sm">
                   <span className="font-medium">Patient:</span>{" "}
-                  {patient.recipient}
+                  {patient.recipient.slice(0, 15) + "..."}
                 </p>
                 <p className="truncate text-sm">
                   <span className="font-medium">Blood Group:&nbsp;</span>
@@ -364,12 +361,13 @@ export default function Dashboard() {
             </div>
           ))}
         {/* If not searching  */}
-        {fuse.search(searchPattern).length > 0 &&
+        {searchPattern.length > 0 &&
           fuse.search(searchPattern)?.map(({ item: patient }, i) => (
             <div
               className="flex h-fit cursor-pointer flex-col rounded-xl border border-slate-200 bg-white p-5 duration-100 hover:scale-105"
               style={{ width: "100%" }} // Set width to 100%
               key={i}
+              onClick={() => router.push(`/patientDashboard/${patient.id}`)}
             >
               <div className="flex items-center gap-2">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -405,6 +403,13 @@ export default function Dashboard() {
               </div>
             </div>
           ))}
+        {
+          searchPattern.length > 0 &&
+          fuse.search(searchPattern).length == 0 &&
+          <div className="flex items-center justify-center w-full h-full">
+            <p className="text-2xl font-bold text-blue-900">No results found</p>
+          </div>
+        }
       </div>
     </div>
   );
