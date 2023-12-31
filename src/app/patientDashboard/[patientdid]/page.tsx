@@ -7,7 +7,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { ArrowRight, Droplet, Minus, Plus, Ruler, Weight } from "lucide-react";
+import {
+  ArrowRight,
+  CalendarIcon,
+  Droplet,
+  Minus,
+  Plus,
+  Ruler,
+  Weight,
+} from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -32,11 +40,20 @@ import {
 import protocolDefinition from "../../../assets/shared-user-protocol.json";
 import useGlobalStore from "../../../hook/useGlobalStore";
 import { Textarea } from "@/components/ui/textarea";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
 
 type Medication = {
   name: string;
   dosage: string;
   frequency: string;
+  tillDate: Date;
 };
 
 export default function PatientDashboard({
@@ -431,20 +448,71 @@ export default function PatientDashboard({
                                               className="mt-2"
                                             />
                                           </div>
-                                          <div className="w-full">
+                                          <div className="flex w-full flex-col">
                                             <Label
-                                              htmlFor={`medications[${index}].frequency`}
+                                              htmlFor={`medications[${index}].tillDate`}
                                               className="ml-1"
                                             >
-                                              Frequency
+                                              Till Date
                                             </Label>
-                                            <Field
-                                              name={`medications[${index}].frequency`}
-                                              as={Input}
-                                              placeholder="Frequency of the Medicine"
-                                              type="text"
-                                              className="mt-2"
-                                            />
+                                            <div className="mt-[0.5rem]">
+                                              <Popover>
+                                                <PopoverTrigger asChild>
+                                                  <Button
+                                                    variant={"outline"}
+                                                    className={cn(
+                                                      "w-[240px] w-full pl-3 text-left font-normal",
+                                                      !formik.values
+                                                        .medications[index]
+                                                        .tillDate &&
+                                                        "text-muted-foreground",
+                                                    )}
+                                                  >
+                                                    {formik.values.medications[
+                                                      index
+                                                    ].tillDate ? (
+                                                      format(
+                                                        formik.values
+                                                          .medications[index]
+                                                          .tillDate,
+                                                        "PPP",
+                                                      )
+                                                    ) : (
+                                                      <span>Pick a date</span>
+                                                    )}
+                                                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                                  </Button>
+                                                </PopoverTrigger>
+                                                <PopoverContent
+                                                  className="w-auto p-0"
+                                                  align="start"
+                                                >
+                                                  <Calendar
+                                                    className="w-full"
+                                                    mode="single"
+                                                    selected={
+                                                      formik.values.medications[
+                                                        index
+                                                      ].tillDate
+                                                    }
+                                                    onSelect={(value) => {
+                                                      {
+                                                        formik.setFieldValue(
+                                                          `medications[${index}].tillDate`,
+                                                          value,
+                                                        );
+                                                      }
+                                                    }}
+                                                    disabled={(date) =>
+                                                      date > new Date() ||
+                                                      date <
+                                                        new Date("1900-01-01")
+                                                    }
+                                                    initialFocus
+                                                  />
+                                                </PopoverContent>
+                                              </Popover>
+                                            </div>
                                           </div>
                                           <Button
                                             className="h-8 w-8 rounded-full p-1"
