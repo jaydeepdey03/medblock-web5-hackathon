@@ -448,6 +448,21 @@ export default function PatientDashboard({
                                               className="mt-2"
                                             />
                                           </div>
+                                          <div className="w-full">
+                                            <Label
+                                              htmlFor={`medications[${index}].frequency`}
+                                              className="ml-1"
+                                            >
+                                              Frequency
+                                            </Label>
+                                            <Field
+                                              name={`medications[${index}].frequency`}
+                                              as={Input}
+                                              placeholder="Frequency of the medicine"
+                                              type="text"
+                                              className="mt-2"
+                                            />
+                                          </div>
                                           <div className="flex w-full flex-col">
                                             <Label
                                               htmlFor={`medications[${index}].tillDate`}
@@ -461,7 +476,7 @@ export default function PatientDashboard({
                                                   <Button
                                                     variant={"outline"}
                                                     className={cn(
-                                                      "w-[240px] w-full pl-3 text-left font-normal",
+                                                      "w-full pl-3 text-left font-normal",
                                                       !formik.values
                                                         .medications[index]
                                                         .tillDate &&
@@ -504,9 +519,7 @@ export default function PatientDashboard({
                                                       }
                                                     }}
                                                     disabled={(date) =>
-                                                      date > new Date() ||
-                                                      date <
-                                                        new Date("1900-01-01")
+                                                      date < new Date()
                                                     }
                                                     initialFocus
                                                   />
