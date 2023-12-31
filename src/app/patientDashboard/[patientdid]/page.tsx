@@ -29,6 +29,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+import protocolDefinition from "../../../assets/shared-user-protocol.json";
+import useGlobalStore from "../../../hook/useGlobalStore";
+
 export default function PatientDashboard({
   params,
 }: {
@@ -44,6 +47,132 @@ export default function PatientDashboard({
   );
 
   console.log(openAllAppointment, "openAllAppointment");
+
+
+  const patientId = decodeURIComponent(params.patientdid);
+  // console.log(patientId, "patientId");
+
+  const { web5, myDid } = useGlobalStore();
+
+  // let todoRecipient;
+  // let todoList = ref({});
+  // let todoItems = ref([]);
+  const [patientDid, setPatientDid] = useState("");
+  const [patient, setPatient] = useState({});
+  const [appointmentItems, setAppointmentItems] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      if (web5 && myDid) {
+
+        // fetch shared list details.
+        const { record } = await web5.dwn.records.read({
+          message: {
+            filter: {
+              recordId: patientId,
+            },
+          },
+        });
+
+        // fetch todos under list.
+        const { records: appointmentRecords } = await web5.dwn.records.query({
+          message: {
+            filter: {
+              parentId: patientId,
+            },
+          },
+        });
+
+        console.log(appointmentRecords, "appointmentRecords");
+
+        let patientInfo = await record.data.json();
+        console.log(patientInfo, 'record');
+        setPatient(patientInfo);
+        setPatientDid(patientInfo.recipient);
+
+        // // Add entry to ToDos array
+        for (let record of appointmentRecords) {
+          const data = await record.data.json();
+          const appointment = { record, data, id: record.id };
+          // todoItems.value.push(todo);
+          // console.log("fetching------->>>> ", appointment);
+          setAppointmentItems(appointmentItems => [appointment, ...appointmentItems]);
+        }
+      }
+    };
+    fetchAppointments();
+  }, [web5, myDid, patientId]);
+
+  async function addAppointment() {
+    const obj = {
+      problem: "problem",
+      diagnosis: "diagnosis",
+      treatment: {
+        medications: [
+          {
+            name: "Lisinopril",
+            dosage: "10mg",
+            frequency: "Once daily",
+          },
+          {
+            name: "Hydrochlorothiazide",
+            dosage: "25mg",
+            frequency: "Once daily",
+          },
+        ],
+        recommendations: [
+          "Maintain a low-sodium diet",
+          "Regular exercise",
+          "Follow-up appointment in 3 months",
+        ],
+      },
+      appointmentDate: "12-11-2003",
+    };
+
+    const appointmentData = {
+      author: myDid,
+      parentId: patientId,
+      problem: obj.problem,
+      diagnosis: obj.diagnosis,
+      treatment: obj.treatment,
+      appointmentDate: obj.appointmentDate,
+    };
+
+    const { record: appointmentRecord, status: createStatus } =
+      await web5.dwn.records.create({
+        data: appointmentData,
+        message: {
+          protocol: protocolDefinition.protocol,
+          protocolPath: "list/appointment",
+          schema: protocolDefinition.types.appointment.schema,
+          dataFormat: protocolDefinition.types.appointment.dataFormats[0],
+          parentId: patientId,
+          contextId: patientId,
+        },
+      });
+
+    const data = await appointmentRecord.data.json();
+    const appointment = { appointmentRecord, data, id: appointmentRecord.id };
+    // todoItems.value.push(todo);
+    setAppointmentItems([appointment, ...appointmentItems]);
+    const { status: sendStatus } = await appointmentRecord.send(patientDid);
+
+    if (sendStatus.code !== 202) {
+      console.log("Unable to send to target did:" + sendStatus);
+      return;
+    } else {
+      console.log("Sent todo to recipient");
+    }
+  }
+
+
+
+
+
+
+
+
+
   return (
     <div className="relative h-full">
       {/* Background circles */}
@@ -60,8 +189,8 @@ export default function PatientDashboard({
             className="grid h-20 w-20 place-items-center rounded-full bg-white"
           />
           <div className="text-center sm:text-left">
-            <h1 className="text-3xl font-bold">Hello,</h1>
-            <p className="text-lg">Welcome to your dashboard</p>
+            <h1 className="text-3xl font-bold">Hello Doctor,</h1>
+            <p className="text-lg">Welcome to {patient !== undefined ? (patient.name + "'s") : ""} dashboard</p>
           </div>
         </div>
       </div>
@@ -162,17 +291,17 @@ export default function PatientDashboard({
           <div className="flex h-full w-full flex-col items-center justify-center space-y-2 rounded-xl border-[1px] border-slate-200 bg-white">
             <Ruler className="h-[50px] w-[50px] text-slate-700" />
             <p className="text-sm font-medium">Height</p>
-            <p className="text-3xl font-semibold">171cm</p>
+            <p className="text-3xl font-semibold">{patient?.height}cm</p>
           </div>
           <div className="flex h-full w-full flex-col items-center justify-center space-y-2 rounded-xl border-[1px] border-slate-200 bg-white">
             <Weight className="h-[50px] w-[50px] text-slate-700" />
             <p className="text-sm font-medium">Weight</p>
-            <p className="text-3xl font-semibold">180kg</p>
+            <p className="text-3xl font-semibold">{patient?.weight}</p>
           </div>
           <div className="flex h-full w-full flex-col items-center justify-center space-y-2 rounded-xl border-[1px] border-slate-200 bg-white">
             <Droplet className="h-[50px] w-[50px] text-slate-700" />
             <p className="text-lg font-medium">Blood Group</p>
-            <p className="text-3xl font-semibold">B+</p>
+            <p className="text-3xl font-semibold">{patient?.bloodGrp}</p>
           </div>
         </div>
         <div className="h-[600px] w-full overflow-hidden rounded-xl xl:col-start-2 xl:col-end-4 xl:row-start-2 xl:row-end-4 xl:h-full">
@@ -326,7 +455,7 @@ export default function PatientDashboard({
                     <div
                       className="flex cursor-pointer items-center rounded-xl px-3 hover:bg-slate-100"
                       key={item}
-                      // onClick={() => setOpenMyNewAppointment((prev) => !prev)}
+                    // onClick={() => setOpenMyNewAppointment((prev) => !prev)}
                     >
                       <div className="flex items-center gap-0 truncate sm:w-[70%]">
                         <Avatar className="h-9 w-9">
