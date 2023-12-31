@@ -58,7 +58,16 @@ export default function PatientDashboard({
   // let todoList = ref({});
   // let todoItems = ref([]);
   const [patientDid, setPatientDid] = useState("");
-  const [patient, setPatient] = useState({});
+  const [patient, setPatient] = useState({
+    author: "",
+    name: "",
+    age: "",
+    height: "",
+    weight: "",
+    bloodGrp: "",
+    recipient: "",
+    gender: "",
+  });
   const [appointmentItems, setAppointmentItems] = useState<any[]>([]);
 
   useEffect(() => {
@@ -190,7 +199,7 @@ export default function PatientDashboard({
           />
           <div className="text-center sm:text-left">
             <h1 className="text-3xl font-bold">Hello Doctor,</h1>
-            <p className="text-lg">Welcome to {patient !== undefined ? (patient.name + "'s") : ""} dashboard</p>
+            <p className="text-lg">Welcome to {patient.name ? (patient.name + "'s") : ""} dashboard</p>
           </div>
         </div>
       </div>
