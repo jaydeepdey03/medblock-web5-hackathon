@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { ArrowRight, Droplet, Ruler, Weight } from "lucide-react";
+import { ArrowRight, Droplet, Minus, Plus, Ruler, Weight } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
-import { Field, Form, Formik } from "formik";
+import { Field, FieldArray, Form, Formik } from "formik";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import {
@@ -31,6 +31,13 @@ import {
 
 import protocolDefinition from "../../../assets/shared-user-protocol.json";
 import useGlobalStore from "../../../hook/useGlobalStore";
+import { Textarea } from "@/components/ui/textarea";
+
+type Medication = {
+  name: string;
+  dosage: string;
+  frequency: string;
+};
 
 export default function PatientDashboard({
   params,
@@ -47,7 +54,6 @@ export default function PatientDashboard({
   );
 
   console.log(openAllAppointment, "openAllAppointment");
-
 
   const patientId = decodeURIComponent(params.patientdid);
   // console.log(patientId, "patientId");
@@ -73,7 +79,6 @@ export default function PatientDashboard({
   useEffect(() => {
     const fetchAppointments = async () => {
       if (web5 && myDid) {
-
         // fetch shared list details.
         const { record } = await web5.dwn.records.read({
           message: {
@@ -95,7 +100,7 @@ export default function PatientDashboard({
         console.log(appointmentRecords, "appointmentRecords");
 
         let patientInfo = await record.data.json();
-        console.log(patientInfo, 'record');
+        console.log(patientInfo, "record");
         setPatient(patientInfo);
         setPatientDid(patientInfo.recipient);
 
@@ -105,7 +110,10 @@ export default function PatientDashboard({
           const appointment = { record, data, id: record.id };
           // todoItems.value.push(todo);
           // console.log("fetching------->>>> ", appointment);
-          setAppointmentItems(appointmentItems => [appointment, ...appointmentItems]);
+          setAppointmentItems((appointmentItems) => [
+            appointment,
+            ...appointmentItems,
+          ]);
         }
       }
     };
@@ -174,14 +182,6 @@ export default function PatientDashboard({
     }
   }
 
-
-
-
-
-
-
-
-
   return (
     <div className="relative h-full">
       {/* Background circles */}
@@ -199,7 +199,9 @@ export default function PatientDashboard({
           />
           <div className="text-center sm:text-left">
             <h1 className="text-3xl font-bold">Hello Doctor,</h1>
-            <p className="text-lg">Welcome to {patient.name ? (patient.name + "'s") : ""} dashboard</p>
+            <p className="text-lg">
+              Welcome to {patient.name ? patient.name + "'s" : ""} dashboard
+            </p>
           </div>
         </div>
       </div>
@@ -332,18 +334,19 @@ export default function PatientDashboard({
                   open={openNewAppointment}
                   onOpenChange={setOpenNewAppointment}
                 >
-                  <DialogContent className="h-[90vh] max-w-[80vw]">
+                  <DialogContent className="h-[90vh] max-w-[80vw] overflow-scroll">
                     <DialogHeader>
-                      <DialogTitle>New Appointment Form</DialogTitle>
+                      <DialogTitle asChild>
+                        <p className="text-3xl font-bold text-blue-800">
+                          Patient Diagnosis Detail
+                        </p>
+                      </DialogTitle>
                       <DialogDescription>
                         <Formik
                           initialValues={{
-                            name: "" as string,
-                            age: "" as string,
-                            bloodGrp: "" as string,
-                            did: "" as string,
-                            height: "",
-                            weight: "",
+                            problem: "" as string,
+                            diagnosis: "" as string,
+                            medications: [] as Medication[],
                           }}
                           onSubmit={(values, _) => {
                             console.log(values);
@@ -351,104 +354,118 @@ export default function PatientDashboard({
                         >
                           {(formik) => (
                             <Form className="flex w-full flex-col items-center space-y-5 p-10">
-                              <p className="text-3xl font-bold text-blue-800">
-                                MedBlock Patient Details
-                              </p>
                               <div className="w-full">
-                                <Label htmlFor="did" className="ml-1">
-                                  DID
+                                <Label htmlFor="problem" className="ml-1">
+                                  Problem
                                 </Label>
                                 <Field
-                                  name="did"
-                                  as={Input}
-                                  placeholder="DID"
+                                  name="problem"
+                                  as={Textarea}
+                                  placeholder="Mention their Problem"
+                                  type="text"
+                                  className="mt-2"
+                                />
+                              </div>
+                              <div className="w-full">
+                                <Label htmlFor="diagnosis" className="ml-1">
+                                  Diagnosis
+                                </Label>
+                                <Field
+                                  name="diagnosis"
+                                  as={Textarea}
+                                  placeholder="Diagnosis of the problem"
                                   type="text"
                                   className="mt-2"
                                 />
                               </div>
 
-                              <div className="w-full">
-                                <Label htmlFor="name" className="ml-1">
-                                  Name
-                                </Label>
-                                <Field
-                                  name="name"
-                                  as={Input}
-                                  placeholder="Name"
-                                  className="mt-2"
-                                />
-                              </div>
-                              <div className="w-full">
-                                <Label htmlFor="age" className="ml-1">
-                                  Age
-                                </Label>
-                                <Field
-                                  name="age"
-                                  as={Input}
-                                  placeholder="Age"
-                                  type="number"
-                                  className="mt-2"
-                                />
-                              </div>
-                              <div className="flex w-full gap-2">
-                                <div className="w-full">
-                                  <Label htmlFor="height" className="ml-1">
-                                    Height
-                                  </Label>
-                                  <Field
-                                    name="height"
-                                    as={Input}
-                                    placeholder="Height"
-                                    type="number"
-                                    className="mt-2"
-                                  />
-                                </div>
-                                <div className="w-full">
-                                  <Label htmlFor="weight" className="ml-1">
-                                    Weight
-                                  </Label>
-                                  <Field
-                                    name="weight"
-                                    as={Input}
-                                    placeholder="Weight"
-                                    type="number"
-                                    className="mt-2"
-                                  />
-                                </div>
-                              </div>
-                              <div className="w-full">
-                                <Label htmlFor="bloodGrp" className="ml-1">
-                                  Blood Group
-                                </Label>
-                                <div className="mb-2" />
-                                <Select
-                                  onValueChange={(value) => {
-                                    formik.setFieldValue("bloodGrp", value);
-                                    // console.log(value);
-                                  }}
-                                >
-                                  <SelectTrigger className="">
-                                    <SelectValue placeholder="Select Blood Group" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="a-">A-</SelectItem>
-                                    <SelectItem value="a+">A+</SelectItem>
-                                    <SelectItem value="b+">B+</SelectItem>
-                                    <SelectItem value="b-">B-</SelectItem>
-                                    <SelectItem value="o+">O+</SelectItem>
-                                    <SelectItem value="o-">O-</SelectItem>
-                                    <SelectItem value="ab+">AB+</SelectItem>
-                                    <SelectItem value="ab-">AB-</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                              </div>
+                              <FieldArray name="medications">
+                                {({ push, remove }) => (
+                                  <>
+                                    <Button
+                                      type="button"
+                                      className="h-10 w-10 rounded-full p-1"
+                                      onClick={() =>
+                                        push({
+                                          name: "",
+                                          dosage: "",
+                                          frequency: "",
+                                        })
+                                      }
+                                    >
+                                      <Plus />
+                                    </Button>
+                                    {formik.values.medications.map(
+                                      (_, index) => (
+                                        <div
+                                          key={index}
+                                          className="flex w-full items-end gap-4"
+                                        >
+                                          <div className="w-full">
+                                            <Label
+                                              htmlFor={`medications[${index}].name`}
+                                              className="ml-1"
+                                            >
+                                              Name of Medicine
+                                            </Label>
+                                            <Field
+                                              name={`medications[${index}].name`}
+                                              as={Input}
+                                              placeholder="Name of Medicine"
+                                              type="text"
+                                              className="mt-2"
+                                            />
+                                          </div>
+                                          <div className="w-full">
+                                            <Label
+                                              htmlFor={`medications[${index}].dosage`}
+                                              className="ml-1"
+                                            >
+                                              Dosage
+                                            </Label>
+                                            <Field
+                                              name={`medications[${index}].dosage`}
+                                              as={Input}
+                                              placeholder="Dosage"
+                                              type="text"
+                                              className="mt-2"
+                                            />
+                                          </div>
+                                          <div className="w-full">
+                                            <Label
+                                              htmlFor={`medications[${index}].frequency`}
+                                              className="ml-1"
+                                            >
+                                              Frequency
+                                            </Label>
+                                            <Field
+                                              name={`medications[${index}].frequency`}
+                                              as={Input}
+                                              placeholder="Frequency of the Medicine"
+                                              type="text"
+                                              className="mt-2"
+                                            />
+                                          </div>
+                                          <Button
+                                            className="h-8 w-8 rounded-full p-1"
+                                            onClick={() => remove(index)}
+                                          >
+                                            <Minus />
+                                          </Button>
+                                        </div>
+                                      ),
+                                    )}
+                                  </>
+                                )}
+                              </FieldArray>
 
                               <div className="w-full">
                                 <Button
                                   type="submit"
                                   className="group flex w-full items-center justify-center bg-blue-800 hover:bg-blue-900"
+                                  onClick={() => setOpenNewAppointment(false)}
                                 >
-                                  <p className="text-white">Add Patient</p>
+                                  <p className="text-white">Add Details</p>
                                   <ArrowRight className="ml-2 h-4 w-4 duration-100 ease-in-out group-hover:translate-x-1" />
                                 </Button>
                               </div>
@@ -464,7 +481,7 @@ export default function PatientDashboard({
                     <div
                       className="flex cursor-pointer items-center rounded-xl px-3 hover:bg-slate-100"
                       key={item}
-                    // onClick={() => setOpenMyNewAppointment((prev) => !prev)}
+                      // onClick={() => setOpenMyNewAppointment((prev) => !prev)}
                     >
                       <div className="flex items-center gap-0 truncate sm:w-[70%]">
                         <Avatar className="h-9 w-9">

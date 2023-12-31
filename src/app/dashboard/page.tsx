@@ -279,6 +279,7 @@ export default function Dashboard() {
                       <Button
                         type="submit"
                         className="group flex w-full items-center justify-center bg-blue-800 hover:bg-blue-900"
+                        onClick={() => setOpen(false)}
                       >
                         <p className="text-white">Add Patient</p>
                         <ArrowRight className="ml-2 h-4 w-4 duration-100 ease-in-out group-hover:translate-x-1" />
@@ -314,8 +315,9 @@ export default function Dashboard() {
       <div
         className="grid h-full w-full place-items-center gap-4 px-10"
         style={{
-          gridTemplateColumns: `repeat(auto-${patients.length <= 1 ? "fit" : "fill"
-            }, minmax(400px, 1fr))`,
+          gridTemplateColumns: `repeat(auto-${
+            patients.length <= 1 ? "fit" : "fill"
+          }, minmax(400px, 1fr))`,
         }}
       >
         {searchPattern.length === 0 &&
@@ -334,13 +336,17 @@ export default function Dashboard() {
                   className="h-9 w-9"
                 />
                 <div className="flex flex-col">
-                  <p className="text-sm capitalize">{patient.name} {searchPattern.length}{patients.length}</p>
+                  <p className="text-sm capitalize">
+                    {patient.name} {searchPattern.length}
+                    {patients.length}
+                  </p>
                   <p className="text-xs capitalize">{patient.gender}</p>
                 </div>
               </div>
               <div className="flex flex-col gap-2 py-3">
                 <p className="truncate text-sm">
-                  <span className="font-medium">Doctor:</span> {patient.author + "..."}
+                  <span className="font-medium">Doctor:</span>{" "}
+                  {patient.author + "..."}
                 </p>
                 <p className="truncate text-sm">
                   <span className="font-medium">Patient:</span>{" "}
@@ -403,13 +409,11 @@ export default function Dashboard() {
               </div>
             </div>
           ))}
-        {
-          searchPattern.length > 0 &&
-          fuse.search(searchPattern).length == 0 &&
-          <div className="flex items-center justify-center w-full h-full">
+        {searchPattern.length > 0 && fuse.search(searchPattern).length == 0 && (
+          <div className="flex h-full w-full items-center justify-center">
             <p className="text-2xl font-bold text-blue-900">No results found</p>
           </div>
-        }
+        )}
       </div>
     </div>
   );
