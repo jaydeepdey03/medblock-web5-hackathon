@@ -39,26 +39,11 @@ export default function PatientDashboard({
     Array(13).fill(false),
   );
 
-  const [screenWidth, setScreenWidth] = useState(window.innerWidth);
-
-  useEffect(() => {
-    // Function to update screenWidth when the window is resized
-    const handleResize = () => {
-      setScreenWidth(window.innerWidth);
-    };
-
-    // Add event listener for window resize
-    window.addEventListener("resize", handleResize);
-
-    // Cleanup the event listener when the component is unmounted
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
-
   const [openAllAppointment, setOpenAllAppointment] = useState<boolean[]>(
     Array(13).fill(false),
   );
+
+  console.log(openAllAppointment, "openAllAppointment");
   return (
     <div className="relative h-full">
       {/* Background circles */}
@@ -193,7 +178,9 @@ export default function PatientDashboard({
         <div className="h-[600px] w-full overflow-hidden rounded-xl xl:col-start-2 xl:col-end-4 xl:row-start-2 xl:row-end-4 xl:h-full">
           <Card className="h-full">
             <CardHeader className="flex flex-row justify-between">
-              <p>My Appointment</p>
+              <p className="text-2xl font-[600] leading-none tracking-tight">
+                My Appointment
+              </p>
               <Button
                 className="w-fit"
                 onClick={() => setOpenNewAppointment((prev) => !prev)}
