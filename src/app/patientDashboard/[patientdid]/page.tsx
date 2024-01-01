@@ -106,61 +106,54 @@ export default function PatientDashboard({
         });
 
         // fetch todos under list.
-        const { records: appointmentRecords } = await web5.dwn.records.query({
+        // const { records: appointmentRecords } = await web5.dwn.records.query({
+        //   message: {
+        //     filter: {
+        //       // parentId: patientId,
+        //     },
+        //   },
+        // });
+
+        const { records } = await web5.dwn.records.query({
           message: {
             filter: {
-              parentId: patientId,
+              schema: protocolDefinition.types.list.schema,
             },
+            dateSort: "createdAscending",
           },
         });
 
-        console.log(appointmentRecords, "appointmentRecords");
+        console.log(records, "records");
+        // console.log(appointmentRecords, "appointmentRecords");
 
         let patientInfo = await record.data.json();
         console.log(patientInfo, "record");
         setPatient(patientInfo);
         setPatientDid(patientInfo.recipient);
 
+        console.log(patientInfo.recipient, "patientInfo.recipient")
         // // Add entry to ToDos array
-        for (let record of appointmentRecords) {
-          const data = await record.data.json();
-          const appointment = { record, data, id: record.id };
-          // todoItems.value.push(todo);
-          // console.log("fetching------->>>> ", appointment);
-          setAppointmentItems((appointmentItems) => [
-            appointment,
-            ...appointmentItems,
-          ]);
-        }
+        let appointmentsArray = [];
+
+        // for (let record of appointmentRecords) {
+        //   const data = await record.data.json();
+        //   const appointment = { record, data, id: record.id };
+        //   console.log("fetching------->>>> ", appointment);
+
+        //   appointmentsArray.push(appointment);
+        // }
+        // if (appointmentItems.length !== appointmentsArray.length)
+        //   setAppointmentItems(appointmentsArray)
       }
     };
     fetchAppointments();
   }, [web5, myDid, patientId]);
 
-  async function addAppointment() {
+  async function addAppointment(values: any) {
     const obj = {
-      problem: "problem",
-      diagnosis: "diagnosis",
-      treatment: {
-        medications: [
-          {
-            name: "Lisinopril",
-            dosage: "10mg",
-            frequency: "Once daily",
-          },
-          {
-            name: "Hydrochlorothiazide",
-            dosage: "25mg",
-            frequency: "Once daily",
-          },
-        ],
-        recommendations: [
-          "Maintain a low-sodium diet",
-          "Regular exercise",
-          "Follow-up appointment in 3 months",
-        ],
-      },
-      appointmentDate: "12-11-2003",
+      ...values
+      ,
+      appointmentDate: new Date(),
     };
 
     const appointmentData = {
@@ -168,7 +161,7 @@ export default function PatientDashboard({
       parentId: patientId,
       problem: obj.problem,
       diagnosis: obj.diagnosis,
-      treatment: obj.treatment,
+      medications: obj.medications,
       appointmentDate: obj.appointmentDate,
     };
 
@@ -195,7 +188,7 @@ export default function PatientDashboard({
       console.log("Unable to send to target did:" + sendStatus);
       return;
     } else {
-      console.log("Sent todo to recipient");
+      console.log("Sent appointment details to patient");
     }
   }
 
@@ -232,7 +225,7 @@ export default function PatientDashboard({
           <div className="card-scroll h-full w-full overflow-y-scroll">
             <CardContent className="overflow-hidden p-0">
               <div className="space-y-2 px-7">
-                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13].map(
+                {appointmentItems.map(
                   (item, index) => (
                     <div
                       className="flex cursor-pointer items-center rounded-xl hover:bg-slate-100"
@@ -366,7 +359,8 @@ export default function PatientDashboard({
                             medications: [] as Medication[],
                           }}
                           onSubmit={(values, _) => {
-                            console.log(values);
+                            // console.log(values);
+                            addAppointment(values);
                           }}
                         >
                           {(formik) => (
@@ -480,7 +474,7 @@ export default function PatientDashboard({
                                                       !formik.values
                                                         .medications[index]
                                                         .tillDate &&
-                                                        "text-muted-foreground",
+                                                      "text-muted-foreground",
                                                     )}
                                                   >
                                                     {formik.values.medications[
@@ -558,11 +552,11 @@ export default function PatientDashboard({
                   </DialogContent>
                 </Dialog>
                 <div className="space-y-2">
-                  {[1, 2, 3, 4, 5, 6, 9, 10, 11, 12, 13, 14].map((item) => (
+                  {appointmentItems.map((item) => (
                     <div
                       className="flex cursor-pointer items-center rounded-xl px-3 hover:bg-slate-100"
                       key={item}
-                      // onClick={() => setOpenMyNewAppointment((prev) => !prev)}
+                    // onClick={() => setOpenMyNewAppointment((prev) => !prev)}
                     >
                       <div className="flex items-center gap-0 truncate sm:w-[70%]">
                         <Avatar className="h-9 w-9">
@@ -571,17 +565,17 @@ export default function PatientDashboard({
                         </Avatar>
                         <div className="ml-4 mr-3 w-full space-y-1 truncate px-1 py-4">
                           <p className="truncate text-sm font-medium leading-none">
-                            Olivia Martin
+                            {item.data.diagnosis}
                           </p>
                           <p className="truncate text-sm text-muted-foreground">
-                            olivia.martin@email.com
+                            {item.data.author.slice(0, 15) + "..."}
                           </p>
                         </div>
                       </div>
 
                       <div className="ml-auto flex flex-col items-end sm:w-fit">
                         <p className="text-right text-xs font-medium sm:text-sm">
-                          {new Date("2021-08-17T09:00:00.000Z").toLocaleString(
+                          {new Date(item.data.appointmentDate).toLocaleString(
                             "en-us",
                             {
                               year: "numeric",
@@ -591,7 +585,7 @@ export default function PatientDashboard({
                           )}
                         </p>
                         <p className="text-right text-xs font-normal sm:text-sm">
-                          {new Date("2021-08-17T09:00:00.000Z").toLocaleString(
+                          {new Date(item.data.appointmentDate).toLocaleString(
                             "en-us",
                             {
                               hour: "numeric",
