@@ -26,6 +26,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import Fuse from "fuse.js";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 export default function Dashboard() {
   const { web5, myDid } = useGlobalStore();
@@ -295,126 +304,160 @@ export default function Dashboard() {
       <p className="mb-6 py-5 text-center font-inter text-4xl font-bold text-blue-900">
         List of Patient
       </p>
-      <div className="flex justify-between space-x-2 px-10 py-4">
-        <Input
-          type="text"
-          placeholder="Name"
-          value={searchPattern}
-          onChange={(e) => setSearchPattern(e.target.value)}
-          className="focus-visible:ring-2 focus-visible:ring-blue-800 focus-visible:ring-opacity-50"
-        />
+      <Tabs defaultValue="patient" className="w-full">
+        <TabsList className="ml-10">
+          <TabsTrigger value="patient">Patient</TabsTrigger>
+          <TabsTrigger value="doctor">Doctor</TabsTrigger>
+        </TabsList>
+        <TabsContent value="patient" className="w-full">
+          <div className="flex justify-between space-x-2 px-10 py-4">
+            <Input
+              type="text"
+              placeholder="Name"
+              value={searchPattern}
+              onChange={(e) => setSearchPattern(e.target.value)}
+              className="focus-visible:ring-2 focus-visible:ring-blue-800 focus-visible:ring-opacity-50"
+            />
 
-        <Button
-          className="w-fit bg-blue-800 hover:bg-blue-900"
-          onClick={() => setOpen((prev) => !prev)}
-        >
-          Add New Patient
-        </Button>
-      </div>
-
-      <div
-        className="grid h-full w-full place-items-center gap-4 px-10"
-        style={{
-          gridTemplateColumns: `repeat(auto-${
-            patients.length <= 1 ? "fit" : "fill"
-          }, minmax(400px, 1fr))`,
-        }}
-      >
-        {searchPattern.length === 0 &&
-          patients.map((patient, i) => (
-            <div
-              className="flex h-fit w-full cursor-pointer flex-col rounded-xl border border-slate-200 bg-white p-5 duration-100 hover:scale-105"
-              // style={{ width: "100%" }} // Set width to 100%
-              key={i}
-              onClick={() => router.push(`/patientDashboard/${patient.id}`)}
+            <Button
+              className="w-fit bg-blue-800 hover:bg-blue-900"
+              onClick={() => setOpen((prev) => !prev)}
             >
-              <div className="flex items-center gap-2">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={`/${patient.gender === "male" ? "boy" : "girl"}.png`}
-                  alt="doctor"
-                  className="h-9 w-9"
-                />
-                <div className="flex flex-col">
-                  <p className="text-sm capitalize">
-                    {patient.name} {searchPattern.length}
-                    {patients.length}
-                  </p>
-                  <p className="text-xs capitalize">{patient.gender}</p>
-                </div>
-              </div>
-              <div className="flex flex-col gap-2 py-3">
-                <p className="truncate text-sm">
-                  <span className="font-medium">Doctor:</span>{" "}
-                  {patient.author + "..."}
-                </p>
-                <p className="truncate text-sm">
-                  <span className="font-medium">Patient:</span>{" "}
-                  {patient.recipient.slice(0, 15) + "..."}
-                </p>
-                <p className="truncate text-sm">
-                  <span className="font-medium">Blood Group:&nbsp;</span>
-
-                  {patient.bloodGrp?.toUpperCase()}
-                </p>
-                <p className="truncate text-sm">
-                  <span className="font-medium">Height:</span> {patient.height}
-                </p>
-                <p className="truncate text-sm">
-                  <span className="font-medium">Weight:</span> {patient.weight}
-                </p>
-              </div>
-            </div>
-          ))}
-        {/* If not searching  */}
-        {searchPattern.length > 0 &&
-          fuse.search(searchPattern)?.map(({ item: patient }, i) => (
-            <div
-              className="flex h-fit cursor-pointer flex-col rounded-xl border border-slate-200 bg-white p-5 duration-100 hover:scale-105"
-              style={{ width: "100%" }} // Set width to 100%
-              key={i}
-              onClick={() => router.push(`/patientDashboard/${patient.id}`)}
-            >
-              <div className="flex items-center gap-2">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={`/${patient.gender === "male" ? "boy" : "girl"}.png`}
-                  alt="doctor"
-                  className="h-9 w-9"
-                />
-                <div className="flex flex-col">
-                  <p className="text-sm capitalize">{patient.name}</p>
-                  <p className="text-xs capitalize">{patient.gender}</p>
-                </div>
-              </div>
-              <div className="flex flex-col gap-2 py-3">
-                <p className="truncate text-sm">
-                  <span className="font-medium">Doctor:</span> {patient.author}
-                </p>
-                <p className="truncate text-sm">
-                  <span className="font-medium">Patient:</span>{" "}
-                  {patient.recipient}
-                </p>
-                <p className="truncate text-sm">
-                  <span className="font-medium">Blood Group:&nbsp;</span>
-
-                  {patient.bloodGrp?.toUpperCase()}
-                </p>
-                <p className="truncate text-sm">
-                  <span className="font-medium">Height:</span> {patient.height}
-                </p>
-                <p className="truncate text-sm">
-                  <span className="font-medium">Weight:</span> {patient.weight}
-                </p>
-              </div>
-            </div>
-          ))}
-        {searchPattern.length > 0 && fuse.search(searchPattern).length == 0 && (
-          <div className="flex h-full w-full items-center justify-center">
-            <p className="text-2xl font-bold text-blue-900">No results found</p>
+              Add New Patient
+            </Button>
           </div>
-        )}
-      </div>
+
+          <div
+            className="grid h-full w-full place-items-center gap-4 px-10"
+            style={{
+              gridTemplateColumns: `repeat(auto-${
+                patients.length <= 1 ? "fit" : "fill"
+              }, minmax(400px, 1fr))`,
+            }}
+          >
+            {searchPattern.length === 0 &&
+              patients.map((patient, i) => (
+                <div
+                  className="flex h-fit w-full cursor-pointer flex-col rounded-xl border border-slate-200 bg-white p-5"
+                  // style={{ width: "100%" }} // Set width to 100%
+                  key={i}
+                  onClick={() => router.push(`/patientDashboard/${patient.id}`)}
+                >
+                  <div className="flex items-center gap-2">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={`/${patient.gender === "male" ? "boy" : "girl"}.png`}
+                      alt="doctor"
+                      className="h-9 w-9"
+                    />
+                    <div className="flex flex-col">
+                      <p className="text-sm capitalize">
+                        {patient.name} {searchPattern.length}
+                        {patients.length}
+                      </p>
+                      <p className="text-xs capitalize">{patient.gender}</p>
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-2 py-3">
+                    <p className="truncate text-sm">
+                      <span className="font-medium">Doctor:</span>{" "}
+                      {patient.author + "..."}
+                    </p>
+                    <p className="truncate text-sm">
+                      <span className="font-medium">Patient:</span>{" "}
+                      {patient.recipient}
+                    </p>
+                    <p className="truncate text-sm">
+                      <span className="font-medium">Blood Group:&nbsp;</span>
+
+                      {patient.bloodGrp?.toUpperCase()}
+                    </p>
+                    <p className="truncate text-sm">
+                      <span className="font-medium">Height:</span>{" "}
+                      {patient.height}
+                    </p>
+                    <p className="truncate text-sm">
+                      <span className="font-medium">Weight:</span>{" "}
+                      {patient.weight}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            {/* If not searching  */}
+            {searchPattern.length > 0 &&
+              fuse.search(searchPattern)?.map(({ item: patient }, i) => (
+                <div
+                  className="flex h-fit cursor-pointer flex-col rounded-xl border border-slate-200 bg-white p-5 duration-100 hover:scale-105"
+                  style={{ width: "100%" }} // Set width to 100%
+                  key={i}
+                  onClick={() => router.push(`/patientDashboard/${patient.id}`)}
+                >
+                  <div className="flex items-center gap-2">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={`/${patient.gender === "male" ? "boy" : "girl"}.png`}
+                      alt="doctor"
+                      className="h-9 w-9"
+                    />
+                    <div className="flex flex-col">
+                      <p className="text-sm capitalize">{patient.name}</p>
+                      <p className="text-xs capitalize">{patient.gender}</p>
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-2 py-3">
+                    <p className="truncate text-sm">
+                      <span className="font-medium">Doctor:</span>{" "}
+                      {patient.author.slice(0, 5) +
+                        "..." +
+                        patient.author.slice(-8)}
+                    </p>
+                    <p className="truncate text-sm">
+                      <span className="font-medium">Patient:</span>{" "}
+                      {patient.recipient.slice(0, 5) +
+                        "..." +
+                        patient.recipient.slice(-8)}
+                    </p>
+                    <p className="truncate text-sm">
+                      <span className="font-medium">Blood Group:&nbsp;</span>
+
+                      {patient.bloodGrp?.toUpperCase()}
+                    </p>
+                    <p className="truncate text-sm">
+                      <span className="font-medium">Height:</span>{" "}
+                      {patient.height}
+                    </p>
+                    <p className="truncate text-sm">
+                      <span className="font-medium">Weight:</span>{" "}
+                      {patient.weight}
+                    </p>
+                  </div>
+                </div>
+              ))}
+          </div>
+          {searchPattern.length > 0 &&
+            fuse.search(searchPattern).length == 0 && (
+              <div className="flex h-full w-full items-center justify-center p-10">
+                <p className="text-center text-2xl font-bold text-blue-900">
+                  No results found
+                </p>
+              </div>
+            )}
+        </TabsContent>
+        <TabsContent value="doctor" className="mx-10">
+          <Card className="h-[100px] shadow-none">
+            <CardHeader className="flex w-full flex-row justify-between">
+              <div className="flex flex-col space-y-1">
+                <p className="text-xl font-medium">Doctor</p>
+                <CardDescription>Did: </CardDescription>
+              </div>
+              <Button>Send Details</Button>
+            </CardHeader>
+            {/* <CardContent>
+              <p>Card Content</p>
+            </CardContent> */}
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
