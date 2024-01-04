@@ -21,6 +21,10 @@
         {
           "who": "anyone",
           "can": "write"
+        },
+        {
+          "who": "anyone",
+          "can": "query"
         }
       ],
       "appointment": {
@@ -34,6 +38,11 @@
             "who": "recipient",
             "of": "list",
             "can": "read"
+          },
+          {
+            "who": "anyone",
+            "of": "list",
+            "can": "query"
           }
         ]
       }

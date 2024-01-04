@@ -131,7 +131,7 @@ export default function PatientDashboard({
         setPatient(patientInfo);
         setPatientDid(patientInfo.recipient);
 
-        console.log(patientInfo.recipient, "patientInfo.recipient")
+        console.log(patientInfo.recipient, "patientInfo.recipient");
         // // Add entry to ToDos array
         let appointmentsArray = [];
 
@@ -151,8 +151,7 @@ export default function PatientDashboard({
 
   async function addAppointment(values: any) {
     const obj = {
-      ...values
-      ,
+      ...values,
       appointmentDate: new Date(),
     };
 
@@ -225,85 +224,83 @@ export default function PatientDashboard({
           <div className="card-scroll h-full w-full overflow-y-scroll">
             <CardContent className="overflow-hidden p-0">
               <div className="space-y-2 px-7">
-                {appointmentItems.map(
-                  (item, index) => (
-                    <div
-                      className="flex cursor-pointer items-center rounded-xl hover:bg-slate-100"
-                      key={item}
-                      onClick={() => {
+                {appointmentItems.map((item, index) => (
+                  <div
+                    className="flex cursor-pointer items-center rounded-xl hover:bg-slate-100"
+                    key={item}
+                    onClick={() => {
+                      setOpenAllAppointment((prevState) => {
+                        // set the index to true
+                        let temp = [...prevState];
+                        temp[index] = true;
+                        return temp;
+                      });
+                    }}
+                  >
+                    <Dialog
+                      key={index}
+                      open={openAllAppointment[index]}
+                      onOpenChange={(val) => {
                         setOpenAllAppointment((prevState) => {
-                          // set the index to true
+                          // set the value to the value at the index
                           let temp = [...prevState];
-                          temp[index] = true;
+                          temp[index] = val;
                           return temp;
                         });
                       }}
                     >
-                      <Dialog
-                        key={index}
-                        open={openAllAppointment[index]}
-                        onOpenChange={(val) => {
-                          setOpenAllAppointment((prevState) => {
-                            // set the value to the value at the index
-                            let temp = [...prevState];
-                            temp[index] = val;
-                            return temp;
-                          });
-                        }}
-                      >
-                        <DialogContent className="h-[90vh] max-w-[80vw]">
-                          <DialogHeader>
-                            <DialogTitle>
-                              Are you sure absolutely sure? {item}
-                            </DialogTitle>
-                            <DialogDescription>
-                              This action cannot be undone. This will
-                              permanently delete your account and remove your
-                              data from our servers.
-                            </DialogDescription>
-                          </DialogHeader>
-                        </DialogContent>
-                      </Dialog>
-                      <div className="flex items-center gap-0 truncate sm:w-[70%]">
-                        <Avatar className="h-9 w-9">
-                          <AvatarImage src="/avatars/01.png" alt="Avatar" />
-                          <AvatarFallback>OM</AvatarFallback>
-                        </Avatar>
-                        <div className="ml-4 mr-3 w-full space-y-1 truncate px-1 py-4">
-                          <p className="truncate text-sm font-medium leading-none">
-                            Olivia Martin
-                          </p>
-                          <p className="truncate text-sm text-muted-foreground">
-                            olivia.martin@email.com
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="ml-auto flex flex-col items-end sm:w-fit">
-                        <p className="text-right text-xs font-medium sm:text-sm">
-                          {new Date("2021-08-17T09:00:00.000Z").toLocaleString(
-                            "en-us",
-                            {
-                              year: "numeric",
-                              month: "long",
-                              day: "numeric",
-                            },
-                          )}
+                      <DialogContent className="h-[90vh] max-w-[80vw]">
+                        <DialogHeader>
+                          <DialogTitle>
+                            Are you sure absolutely sure? {item}
+                          </DialogTitle>
+                          <DialogDescription>
+                            This action cannot be undone. This will permanently
+                            delete your account and remove your data from our
+                            servers.
+                          </DialogDescription>
+                        </DialogHeader>
+                      </DialogContent>
+                    </Dialog>
+                    <div className="flex items-center gap-0 truncate sm:w-[70%]">
+                      <Avatar className="h-9 w-9">
+                        <AvatarImage src="/avatars/01.png" alt="Avatar" />
+                        <AvatarFallback>OM</AvatarFallback>
+                      </Avatar>
+                      <div className="ml-4 mr-3 w-full space-y-1 truncate px-1 py-4">
+                        <p className="truncate text-sm font-medium leading-none">
+                          Olivia Martin
                         </p>
-                        <p className="text-right text-xs font-normal sm:text-sm">
-                          {new Date("2021-08-17T09:00:00.000Z").toLocaleString(
-                            "en-us",
-                            {
-                              hour: "numeric",
-                              minute: "numeric",
-                              hour12: true,
-                            },
-                          )}
+                        <p className="truncate text-sm text-muted-foreground">
+                          olivia.martin@email.com
                         </p>
                       </div>
                     </div>
-                  ),
-                )}
+
+                    <div className="ml-auto flex flex-col items-end sm:w-fit">
+                      <p className="text-right text-xs font-medium sm:text-sm">
+                        {new Date("2021-08-17T09:00:00.000Z").toLocaleString(
+                          "en-us",
+                          {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          },
+                        )}
+                      </p>
+                      <p className="text-right text-xs font-normal sm:text-sm">
+                        {new Date("2021-08-17T09:00:00.000Z").toLocaleString(
+                          "en-us",
+                          {
+                            hour: "numeric",
+                            minute: "numeric",
+                            hour12: true,
+                          },
+                        )}
+                      </p>
+                    </div>
+                  </div>
+                ))}
               </div>
             </CardContent>
           </div>
@@ -474,7 +471,7 @@ export default function PatientDashboard({
                                                       !formik.values
                                                         .medications[index]
                                                         .tillDate &&
-                                                      "text-muted-foreground",
+                                                        "text-muted-foreground",
                                                     )}
                                                   >
                                                     {formik.values.medications[
@@ -556,7 +553,7 @@ export default function PatientDashboard({
                     <div
                       className="flex cursor-pointer items-center rounded-xl px-3 hover:bg-slate-100"
                       key={item}
-                    // onClick={() => setOpenMyNewAppointment((prev) => !prev)}
+                      // onClick={() => setOpenMyNewAppointment((prev) => !prev)}
                     >
                       <div className="flex items-center gap-0 truncate sm:w-[70%]">
                         <Avatar className="h-9 w-9">

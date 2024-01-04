@@ -2,22 +2,20 @@
 
 import { useEffect, useState } from "react";
 import useGlobalStore from "../../hook/useGlobalStore";
-import protocolDefinition from "../../assets/shared-user-protocol.json";
+// import protocolDefinition from "../../assets/shared-user-protocol.json";
 import { Button } from "@/components/ui/button";
 import { Field, Form, Formik } from "formik";
 import { useRouter } from "next/navigation";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogHeader,
-  DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { ArrowRight, Droplet, Stethoscope, Syringe } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -27,14 +25,8 @@ import {
 } from "@/components/ui/select";
 import Fuse from "fuse.js";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardDescription, CardHeader } from "@/components/ui/card";
+import createProtocolDefinition from "@/lib/Protocol";
 
 export default function Dashboard() {
   const { web5, myDid } = useGlobalStore();
@@ -43,56 +35,67 @@ export default function Dashboard() {
   const router = useRouter();
   const [open, setOpen] = useState<boolean>(false);
   const [searchPattern, setSearchPattern] = useState<string>("");
+  const [receipientDidValue, setReceipientDidValue] = useState<string>("");
   const fuse = new Fuse(patients, {
     keys: ["name"],
   });
 
-  useEffect(() => {
-    if (web5) {
-      console.log("number of callss---------");
-      fetchList(web5);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [web5]);
-
-  const fetchList = async (web5: any) => {
+  const fetchList = async (web5Instance: any) => {
+    const protocolDefinition = await createProtocolDefinition();
     try {
-      console.log("Fetching list-------", web5);
+      console.log("Fetching list...");
 
-      const { records } = await web5.dwn.records.query({
+      const response = await web5Instance.dwn.records.query({
+        from: myDid,
         message: {
           filter: {
+            protocol: protocolDefinition.protocol,
             schema: protocolDefinition.types.list.schema,
           },
-          dateSort: "createdAscending",
         },
       });
+      console.log("Saved Response", response);
 
-      console.log("Saved records", records);
+      if (response.status.code === 200) {
+        const patientRecords = await Promise.all(
+          response.records.map(async (record: any) => {
+            const data = await record.data.json();
+            return {
+              ...data,
+              recordId: record.id,
+            };
+          }),
+        );
+        setPatients(patientRecords);
+        console.log("Patient records:", patientRecords);
+        return patientRecords;
+      }
 
       // add entry to sharedList
-      let patientsArray: any[] = [];
-      for (let record of records) {
-        const data = await record.data.json();
-        const list = { record, ...data, id: record.id };
+      // let patientsArray: any[] = [];
+      // for (let record of records) {
+      //   const data = await record.data.json();
+      //   const list = { record, ...data, id: record.id };
 
-        // console.log("Added record", list);
-        // // add to existing state of the patient
-        if (!patientsArray.some((item) => item.id === list.id)) {
-          patientsArray.push(list);
-        }
-        // setPatients((prev) => [list, ...prev]);
-        console.log("Updated records", patientsArray);
-        if (patientsArray.length !== patients.length)
-          setPatients(patientsArray);
-      }
+      //   // console.log("Added record", list);
+      //   // // add to existing state of the patient
+      //   if (!patientsArray.some((item) => item.id === list.id)) {
+      //     patientsArray.push(list);
+      //   }
+      //   // setPatients((prev) => [list, ...prev]);
+      //   console.log("Updated records", patientsArray);
+      //   if (patientsArray.length !== patients.length)
+      //     setPatients(patientsArray);
+      // }
     } catch (error) {
-      console.log("Failed ", error);
+      console.log("err 1 in dashboard ", error);
     }
   };
 
   const addNewPatient = async (patientDetails: any) => {
+    const protocolDefinition = await createProtocolDefinition();
     let recipientDID = patientDetails.did;
+    setReceipientDidValue(recipientDID);
 
     const sharedListData = {
       "@type": "list",
@@ -105,10 +108,9 @@ export default function Dashboard() {
       recipient: recipientDID,
       gender: patientDetails.gender,
     };
-
-    console.log(sharedListData);
+    console.log(sharedListData, "sharedListData");
     try {
-      const { record } = await web5.dwn.records.create({
+      const { record, status } = await web5.dwn.records.create({
         data: sharedListData,
         message: {
           protocol: protocolDefinition.protocol,
@@ -123,26 +125,43 @@ export default function Dashboard() {
       const list = { record, ...data, id: record.id };
 
       // sharedList.value.push(list);
-      setPatients([list, ...patients]);
+      // setPatients([list, ...patients]);
       // showForm.value = false
 
+      const { status: sendToMeStatus } = await record.send(myDid);
       const { status: sendStatus } = await record.send(recipientDID);
+      console.log("Record sent", sendStatus);
 
       if (sendStatus.code !== 202) {
         console.log("Unable to send to target did:" + sendStatus);
         return;
       } else {
         console.log("Shared list sent to recipient");
+        console.log(sendStatus.code, "status code");
       }
     } catch (e) {
-      console.error(e);
+      console.error(e, "err 2 in dashboard");
       return;
     }
   };
 
   useEffect(() => {
-    console.log("patientsssss----  ", patients);
-  }, [patients]);
+    console.log(web5, "web5 in dashboard");
+  }, [web5]);
+
+  useEffect(() => {
+    if (web5) {
+      fetchList(web5);
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [web5]);
+
+  const handleCopyDid = () => {
+    navigator.clipboard.writeText(myDid);
+    console.log(myDid);
+    alert("DID copied to clipboard");
+  };
 
   return (
     <div className="relative flex h-full w-full flex-col gap-2 p-5">
@@ -304,6 +323,10 @@ export default function Dashboard() {
       <p className="mb-6 py-5 text-center font-inter text-4xl font-bold text-blue-900">
         List of Patient
       </p>
+      <Button onClick={handleCopyDid} className="w-fit">
+        Copy Did
+      </Button>
+
       <Tabs defaultValue="patient" className="w-full">
         <TabsList className="ml-10">
           <TabsTrigger value="patient">Patient</TabsTrigger>
