@@ -96,6 +96,8 @@ export default function PatientDashboard({
   useEffect(() => {
     const fetchAppointments = async () => {
       if (web5 && myDid) {
+
+        console.log("Fetching ", patientId, "...");
         // fetch shared list details.
         const { record } = await web5.dwn.records.read({
           message: {
@@ -105,45 +107,27 @@ export default function PatientDashboard({
           },
         });
 
-        // fetch todos under list.
-        // const { records: appointmentRecords } = await web5.dwn.records.query({
-        //   message: {
-        //     filter: {
-        //       // parentId: patientId,
-        //     },
-        //   },
-        // });
 
-        const { records } = await web5.dwn.records.query({
+        console.log(record, "received");
+        // fetch todos under list.
+        const { records: appointmentRecords } = await web5.dwn.records.query({
           message: {
             filter: {
-              schema: protocolDefinition.types.list.schema,
+              parentId: patientId,
             },
-            dateSort: "createdAscending",
           },
         });
-
-        console.log(records, "records");
-        // console.log(appointmentRecords, "appointmentRecords");
-
-        let patientInfo = await record.data.json();
-        console.log(patientInfo, "record");
-        setPatient(patientInfo);
-        setPatientDid(patientInfo.recipient);
-
-        console.log(patientInfo.recipient, "patientInfo.recipient");
-        // // Add entry to ToDos array
         let appointmentsArray = [];
 
-        // for (let record of appointmentRecords) {
-        //   const data = await record.data.json();
-        //   const appointment = { record, data, id: record.id };
-        //   console.log("fetching------->>>> ", appointment);
+        for (let record of appointmentRecords) {
+          const data = await record.data.json();
+          const appointment = { record, data, id: record.id };
+          console.log("fetching------->>>> ", appointment);
 
-        //   appointmentsArray.push(appointment);
-        // }
-        // if (appointmentItems.length !== appointmentsArray.length)
-        //   setAppointmentItems(appointmentsArray)
+          appointmentsArray.push(appointment);
+        }
+        if (appointmentItems.length !== appointmentsArray.length)
+          setAppointmentItems(appointmentsArray)
       }
     };
     fetchAppointments();
@@ -471,7 +455,7 @@ export default function PatientDashboard({
                                                       !formik.values
                                                         .medications[index]
                                                         .tillDate &&
-                                                        "text-muted-foreground",
+                                                      "text-muted-foreground",
                                                     )}
                                                   >
                                                     {formik.values.medications[
@@ -553,7 +537,7 @@ export default function PatientDashboard({
                     <div
                       className="flex cursor-pointer items-center rounded-xl px-3 hover:bg-slate-100"
                       key={item}
-                      // onClick={() => setOpenMyNewAppointment((prev) => !prev)}
+                    // onClick={() => setOpenMyNewAppointment((prev) => !prev)}
                     >
                       <div className="flex items-center gap-0 truncate sm:w-[70%]">
                         <Avatar className="h-9 w-9">

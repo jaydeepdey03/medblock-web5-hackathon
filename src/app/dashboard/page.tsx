@@ -32,6 +32,7 @@ export default function Dashboard() {
   const { web5, myDid } = useGlobalStore();
 
   const [patients, setPatients] = useState<any[]>([]);
+  const [doctors, setDoctors] = useState<any[]>([]);
   const router = useRouter();
   const [open, setOpen] = useState<boolean>(false);
   const [searchPattern, setSearchPattern] = useState<string>("");
@@ -57,7 +58,7 @@ export default function Dashboard() {
       console.log("Saved Response", response);
 
       if (response.status.code === 200) {
-        const patientRecords = await Promise.all(
+        const records = await Promise.all(
           response.records.map(async (record: any) => {
             const data = await record.data.json();
             return {
@@ -66,6 +67,17 @@ export default function Dashboard() {
             };
           }),
         );
+        const patientRecords: any[] = [];
+        const doctorRecords: any = [];
+        records.forEach((record) => {
+          if (record.author === myDid) {
+            patientRecords.push(record);
+          }
+          else {
+            doctorRecords.push(record);
+          }
+        })
+        setDoctors(doctorRecords)
         setPatients(patientRecords);
         console.log("Patient records:", patientRecords);
         return patientRecords;
@@ -124,9 +136,6 @@ export default function Dashboard() {
       const data = await record.data.json();
       const list = { record, ...data, id: record.id };
 
-      // sharedList.value.push(list);
-      // setPatients([list, ...patients]);
-      // showForm.value = false
 
       const { status: sendToMeStatus } = await record.send(myDid);
       const { status: sendStatus } = await record.send(recipientDID);
@@ -136,6 +145,8 @@ export default function Dashboard() {
         console.log("Unable to send to target did:" + sendStatus);
         return;
       } else {
+
+        setPatients([...patients, list]);
         console.log("Shared list sent to recipient");
         console.log(sendStatus.code, "status code");
       }
@@ -156,6 +167,20 @@ export default function Dashboard() {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [web5]);
+
+  const deletePatient = async (recordId: string) => {
+    console.log("deletePatient", recordId);
+    try {
+      const deleteResult = await web5.dwn.records.delete({
+        message: {
+          recordId: recordId
+        },
+      });
+      console.log(deleteResult);
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   const handleCopyDid = () => {
     navigator.clipboard.writeText(myDid);
@@ -321,7 +346,7 @@ export default function Dashboard() {
         </DialogContent>
       </Dialog>
       <p className="mb-6 py-5 text-center font-inter text-4xl font-bold text-blue-900">
-        List of Patient
+        Welcome to dashboard
       </p>
       <Button onClick={handleCopyDid} className="w-fit">
         Copy Did
@@ -353,9 +378,8 @@ export default function Dashboard() {
           <div
             className="grid h-full w-full place-items-center gap-4 px-10"
             style={{
-              gridTemplateColumns: `repeat(auto-${
-                patients.length <= 1 ? "fit" : "fill"
-              }, minmax(400px, 1fr))`,
+              gridTemplateColumns: `repeat(auto-${patients.length <= 1 ? "fit" : "fill"
+                }, minmax(400px, 1fr))`,
             }}
           >
             {searchPattern.length === 0 &&
@@ -364,7 +388,10 @@ export default function Dashboard() {
                   className="flex h-fit w-full cursor-pointer flex-col rounded-xl border border-slate-200 bg-white p-5"
                   // style={{ width: "100%" }} // Set width to 100%
                   key={i}
-                  onClick={() => router.push(`/patientDashboard/${patient.id}`)}
+                  onClick={() =>
+                    // deletePatient(patient.recordId)
+                    router.push(`/patientDashboard/${patient.recordId}`)
+                  }
                 >
                   <div className="flex items-center gap-2">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -467,18 +494,22 @@ export default function Dashboard() {
             )}
         </TabsContent>
         <TabsContent value="doctor" className="mx-10">
-          <Card className="h-[100px] shadow-none">
-            <CardHeader className="flex w-full flex-row justify-between">
-              <div className="flex flex-col space-y-1">
-                <p className="text-xl font-medium">Doctor</p>
-                <CardDescription>Did: </CardDescription>
-              </div>
-              <Button>Send Details</Button>
-            </CardHeader>
-            {/* <CardContent>
+          {
+            doctors.map((doctor, index) => (
+              <Card className="h-[100px] shadow-none" key={index}>
+                <CardHeader className="flex w-full flex-row justify-between">
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-xl font-medium">Doctor</p>
+                    <CardDescription>{doctor.author.slice(0, 15) + "..." + doctor.author.slice(-8)}</CardDescription>
+                  </div>
+                  <Button>Send Details</Button>
+                </CardHeader>
+                {/* <CardContent>
               <p>Card Content</p>
             </CardContent> */}
-          </Card>
+              </Card>
+            ))
+          }
         </TabsContent>
       </Tabs>
     </div>
