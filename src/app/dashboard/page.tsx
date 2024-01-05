@@ -72,12 +72,11 @@ export default function Dashboard() {
         records.forEach((record) => {
           if (record.author === myDid) {
             patientRecords.push(record);
-          }
-          else {
+          } else {
             doctorRecords.push(record);
           }
-        })
-        setDoctors(doctorRecords)
+        });
+        setDoctors(doctorRecords);
         setPatients(patientRecords);
         console.log("Patient records:", patientRecords);
         return patientRecords;
@@ -136,7 +135,6 @@ export default function Dashboard() {
       const data = await record.data.json();
       const list = { record, ...data, id: record.id };
 
-
       const { status: sendToMeStatus } = await record.send(myDid);
       const { status: sendStatus } = await record.send(recipientDID);
       console.log("Record sent", sendStatus);
@@ -145,7 +143,6 @@ export default function Dashboard() {
         console.log("Unable to send to target did:" + sendStatus);
         return;
       } else {
-
         setPatients([...patients, list]);
         console.log("Shared list sent to recipient");
         console.log(sendStatus.code, "status code");
@@ -173,14 +170,14 @@ export default function Dashboard() {
     try {
       const deleteResult = await web5.dwn.records.delete({
         message: {
-          recordId: recordId
+          recordId: recordId,
         },
       });
       console.log(deleteResult);
     } catch (error) {
       console.error(error);
     }
-  }
+  };
 
   const handleCopyDid = () => {
     navigator.clipboard.writeText(myDid);
@@ -348,14 +345,18 @@ export default function Dashboard() {
       <p className="mb-6 py-5 text-center font-inter text-4xl font-bold text-blue-900">
         Welcome to dashboard
       </p>
-      <Button onClick={handleCopyDid} className="w-fit">
-        Copy Did
-      </Button>
 
-      <Tabs defaultValue="patient" className="w-full">
-        <TabsList className="ml-10">
-          <TabsTrigger value="patient">Patient</TabsTrigger>
-          <TabsTrigger value="doctor">Doctor</TabsTrigger>
+      <Tabs defaultValue="doctor" className="w-full">
+        <TabsList className="ml-10 flex justify-between">
+          <div>
+            <TabsTrigger value="patient">Patient</TabsTrigger>
+            <TabsTrigger value="doctor">Doctor</TabsTrigger>
+          </div>
+          <div className="mr-10">
+            <Button onClick={handleCopyDid} className="w-fit">
+              Copy Did
+            </Button>
+          </div>
         </TabsList>
         <TabsContent value="patient" className="w-full">
           <div className="flex justify-between space-x-2 px-10 py-4">
@@ -378,18 +379,19 @@ export default function Dashboard() {
           <div
             className="grid h-full w-full place-items-center gap-4 px-10"
             style={{
-              gridTemplateColumns: `repeat(auto-${patients.length <= 1 ? "fit" : "fill"
-                }, minmax(400px, 1fr))`,
+              gridTemplateColumns: `repeat(auto-${
+                patients.length <= 1 ? "fit" : "fill"
+              }, minmax(400px, 1fr))`,
             }}
           >
             {searchPattern.length === 0 &&
+              patients &&
               patients.map((patient, i) => (
                 <div
                   className="flex h-fit w-full cursor-pointer flex-col rounded-xl border border-slate-200 bg-white p-5"
                   // style={{ width: "100%" }} // Set width to 100%
                   key={i}
                   onClick={() =>
-                    // deletePatient(patient.recordId)
                     router.push(`/patientDashboard/${patient.recordId}`)
                   }
                 >
@@ -493,23 +495,28 @@ export default function Dashboard() {
               </div>
             )}
         </TabsContent>
-        <TabsContent value="doctor" className="mx-10">
-          {
-            doctors.map((doctor, index) => (
-              <Card className="h-[100px] shadow-none" key={index}>
-                <CardHeader className="flex w-full flex-row justify-between">
-                  <div className="flex flex-col space-y-1">
-                    <p className="text-xl font-medium">Doctor</p>
-                    <CardDescription>{doctor.author.slice(0, 15) + "..." + doctor.author.slice(-8)}</CardDescription>
-                  </div>
-                  <Button>Send Details</Button>
-                </CardHeader>
-                {/* <CardContent>
+        <TabsContent
+          value="doctor"
+          className="mx-10 flex flex-col space-y-3 pt-4"
+        >
+          {doctors.map((doctor, index) => (
+            <Card className="h-[100px] shadow-none" key={index}>
+              <CardHeader className="flex w-full flex-row justify-between">
+                <div className="flex flex-col space-y-1">
+                  <p className="text-xl font-medium">Doctor</p>
+                  <CardDescription>
+                    {doctor.author.slice(0, 15) +
+                      "..." +
+                      doctor.author.slice(-8)}
+                  </CardDescription>
+                </div>
+                <Button>Send Details</Button>
+              </CardHeader>
+              {/* <CardContent>
               <p>Card Content</p>
             </CardContent> */}
-              </Card>
-            ))
-          }
+            </Card>
+          ))}
         </TabsContent>
       </Tabs>
     </div>
