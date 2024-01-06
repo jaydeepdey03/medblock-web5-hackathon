@@ -67,6 +67,8 @@ export default function Dashboard() {
             };
           }),
         );
+        console.log(records, "records");
+        // setPatients(records);
         const patientRecords: any[] = [];
         const doctorRecords: any = [];
         records.forEach((record) => {
@@ -79,7 +81,7 @@ export default function Dashboard() {
         setDoctors(doctorRecords);
         setPatients(patientRecords);
         console.log("Patient records:", patientRecords);
-        return patientRecords;
+        return records;
       }
 
       // add entry to sharedList
@@ -180,9 +182,15 @@ export default function Dashboard() {
   };
 
   const handleCopyDid = () => {
-    navigator.clipboard.writeText(myDid);
+    navigator.clipboard
+      .writeText(myDid)
+      .then(() => {
+        alert("Sucess");
+      })
+      .catch(() => {
+        alert("Error in copying");
+      });
     console.log(myDid);
-    alert("DID copied to clipboard");
   };
 
   return (
@@ -346,7 +354,7 @@ export default function Dashboard() {
         Welcome to dashboard
       </p>
 
-      <Tabs defaultValue="doctor" className="w-full">
+      <Tabs defaultValue="patient" className="w-full">
         <TabsList className="ml-10 flex justify-between">
           <div>
             <TabsTrigger value="patient">Patient</TabsTrigger>

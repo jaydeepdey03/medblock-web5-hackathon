@@ -100,6 +100,7 @@ export default function PatientDashboard({
       if (web5 && myDid) {
         console.log("Fetching ", patientId, "...");
         // fetch shared list details.
+
         const response = await web5.dwn.records.read({
           message: {
             filter: {
@@ -107,6 +108,7 @@ export default function PatientDashboard({
             },
           },
         });
+
         // const readResult = await record.data.json();
 
         // console.log(readResult, "from patient dashboard");

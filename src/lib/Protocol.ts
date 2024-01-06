@@ -40,7 +40,7 @@ export const createProtocolDefinition = async () => {
 
 export default createProtocolDefinition;
 
-export const queryProtocol = async (web5) => {
+export const queryProtocol = async (web5: any) => {
     return await web5.dwn.protocols.query({
         message: {
             protocol: PROTOCOL_URL,
@@ -48,7 +48,7 @@ export const queryProtocol = async (web5) => {
     });
 };
 
-export const installProtocol = async (web5, protocolDefinition, did) => {
+export const installProtocol = async (web5: any, protocolDefinition: any, did: any) => {
     const { protocol } = await web5.dwn.protocols.configure({
         message: {
             definition: protocolDefinition,
