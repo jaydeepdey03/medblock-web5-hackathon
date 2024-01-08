@@ -146,7 +146,6 @@ export default function DIDContextProvider({
       });
       console.log("Saved Response", response);
 
-
       if (response.status.code === 200) {
         const recordss = await Promise.all(
           response.records.map(async (record: any) => {
@@ -166,32 +165,28 @@ export default function DIDContextProvider({
         console.log(recordss, " ----");
 
         recordss.reverse().map((record: any) => {
-
-          console.log()
+          console.log();
           if (!patientMap.has(record.patient) && record.doctor === myDid) {
             patientMap.set(record.patient, true);
-            console.log(record, "jaysdas")
+            console.log(record, "jaysdas");
             uniquePatientRecords.push(record);
           }
 
           if (!doctorMap.has(record.doctor) && record.patient === myDid) {
             doctorMap.set(record.doctor, true);
-            console.log(record, "doc")
+            console.log(record, "doc");
             uniqueDoctorRecords.push(record);
           }
-
         });
         console.log(uniqueDoctorRecords, "unique doctorsss");
         console.log(uniquePatientRecords, "unique patient");
         setDoctorRecords(uniqueDoctorRecords);
-        setPatientRecords(uniquePatientRecords)
+        setPatientRecords(uniquePatientRecords);
       }
-
     } catch (error) {
       console.log("err 1 in dashboard ", error);
     }
   };
-
 
   const updateDetailsToDoctor = async (doctorDid: string) => {
     console.log("updateDetailsToDoctor", doctorDid);
@@ -201,14 +196,13 @@ export default function DIDContextProvider({
 
     doctorRecords.map((record: any) => {
       allAppointmentsForPatient.push(...record.allAppointments);
-    })
+    });
 
-    const recordd = doctorRecords.filter(record =>
-      record.doctor === doctorDid
-    )[0]
+    const recordd = doctorRecords.filter(
+      (record) => record.doctor === doctorDid,
+    )[0];
 
     let recipientDID = doctorDid;
-
 
     const sharedListData = {
       "@type": "list",
@@ -256,18 +250,28 @@ export default function DIDContextProvider({
       console.error(e, "err 2 in dashboard");
       return;
     }
-  }
+  };
 
   useEffect(() => {
+    console.log("hello");
     if (web5) {
+      console.log("hi");
       fetchList(web5);
     }
   }, [web5]);
 
   return (
-    <DIDContext.Provider value={{
-      web5, myDid, doctorRecords, setDoctorRecords, patientRecords, setPatientRecords, updateDetailsToDoctor
-    }}>
+    <DIDContext.Provider
+      value={{
+        web5,
+        myDid,
+        doctorRecords,
+        setDoctorRecords,
+        patientRecords,
+        setPatientRecords,
+        updateDetailsToDoctor,
+      }}
+    >
       {children}
     </DIDContext.Provider>
   );

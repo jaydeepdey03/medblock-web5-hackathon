@@ -30,7 +30,8 @@ import createProtocolDefinition from "@/lib/Protocol";
 import { timeStamp } from "console";
 
 export default function Dashboard() {
-  const { web5, myDid, patientRecords, doctorRecords, updateDetailsToDoctor } = useGlobalStore();
+  const { web5, myDid, patientRecords, doctorRecords, updateDetailsToDoctor } =
+    useGlobalStore();
 
   const [patients, setPatients] = useState<any[]>([]);
   const [doctors, setDoctors] = useState<any[]>([]);
@@ -42,21 +43,15 @@ export default function Dashboard() {
     keys: ["name"],
   });
 
-
   // let patientRecords: any = [];
   // let doctorRecords: any = [];
 
   useEffect(() => {
-
-    if (patientRecords.length > 0) {
+    if (patientRecords && patientRecords.length > 0) {
       setPatients(patientRecords);
-
     }
-    if (doctorRecords.length > 0)
-      setDoctors(doctorRecords);
-
-  }, [patientRecords, doctorRecords, myDid])
-
+    if (doctorRecords && doctorRecords.length > 0) setDoctors(doctorRecords);
+  }, [patientRecords, doctorRecords, myDid]);
 
   const addNewPatient = async (patientDetails: any) => {
     const protocolDefinition = await createProtocolDefinition();
@@ -115,8 +110,6 @@ export default function Dashboard() {
   useEffect(() => {
     console.log(web5, "web5 in dashboard");
   }, [web5]);
-
-
 
   const deletePatient = async (recordId: string) => {
     console.log("deletePatient", recordId);
@@ -332,8 +325,9 @@ export default function Dashboard() {
           <div
             className="grid h-full w-full place-items-center gap-4 px-10"
             style={{
-              gridTemplateColumns: `repeat(auto-${patients.length <= 1 ? "fit" : "fill"
-                }, minmax(400px, 1fr))`,
+              gridTemplateColumns: `repeat(auto-${
+                patients.length <= 1 ? "fit" : "fill"
+              }, minmax(400px, 1fr))`,
             }}
           >
             {searchPattern.length === 0 &&
@@ -395,7 +389,9 @@ export default function Dashboard() {
                   className="flex h-fit cursor-pointer flex-col rounded-xl border border-slate-200 bg-white p-5 duration-100 hover:scale-105"
                   style={{ width: "100%" }} // Set width to 100%
                   key={i}
-                  onClick={() => router.push(`/patientDashboard/${patient.patient}`)}
+                  onClick={() =>
+                    router.push(`/patientDashboard/${patient.patient}`)
+                  }
                 >
                   <div className="flex items-center gap-2">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -463,7 +459,9 @@ export default function Dashboard() {
                       doctor.author.slice(-8)}
                   </CardDescription>
                 </div>
-                <Button onClick={() => updateDetailsToDoctor(doctor.doctor)}>Send Details</Button>
+                <Button onClick={() => updateDetailsToDoctor(doctor.doctor)}>
+                  Send Details
+                </Button>
               </CardHeader>
               {/* <CardContent>
               <p>Card Content</p>

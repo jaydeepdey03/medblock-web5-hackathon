@@ -47,7 +47,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { format } from "date-fns";
+import { format, set } from "date-fns";
 import createProtocolDefinition from "@/lib/Protocol";
 
 type Medication = {
@@ -63,15 +63,6 @@ export default function PatientDashboard({
   params: { patientdid: string };
 }) {
   const [openNewAppointment, setOpenNewAppointment] = useState<boolean>(false);
-  const [openMyNewAppointment, setOpenMyNewAppointment] = useState<boolean[]>(
-    Array(13).fill(false),
-  );
-
-  const [openAllAppointment, setOpenAllAppointment] = useState<boolean[]>(
-    Array(13).fill(false),
-  );
-
-  console.log(openAllAppointment, "openAllAppointment");
 
   const patientId = decodeURIComponent(params.patientdid);
   // console.log(patientId, "patientId");
@@ -112,32 +103,29 @@ export default function PatientDashboard({
   });
   const [appointmentItems, setAppointmentItems] = useState<any[]>([]);
 
-
   useEffect(() => {
-
     const fetchDetails = () => {
+      console.log(patientId, "didi");
+      // console.log(patientDid, "save", records);
 
-      console.log(patientId, "didi")
-      console.log(patientDid, "save", records)
-
-
-      let patient = records.filter((record: any) => (record.patient === patientId))[0];
-      console.log(patient, "patient")
+      let patient = records.filter(
+        (record: any) => record.patient === patientId,
+      )[0];
+      console.log(patient, "patient");
       // console.log(patient, "found")
       if (patient) {
         setPatientDid(patient.recipient);
         setPatientDetails(patient);
-        console.log(patient, "data")
+        console.log(patient, "data");
         setAppointmentItems(patient.allAppointments);
       }
-    }
+    };
 
-    console.log(records, "recordsss")
-    if (web5 && myDid && records.length > 0 && patientId) {
+    console.log(records, "recordsss");
+    if (web5 && myDid && records && records.length > 0 && patientId) {
       fetchDetails();
     }
-  }, [records, web5, myDid, patientId])
-
+  }, [records, web5, myDid, patientId]);
 
   async function addAppointment(values: any) {
     const protocolDefinition = await createProtocolDefinition();
@@ -145,8 +133,8 @@ export default function PatientDashboard({
 
     const newValues = {
       ...values,
-      doctor: myDid
-    }
+      doctor: myDid,
+    };
 
     const sharedListData = {
       "@type": "list",
@@ -175,7 +163,7 @@ export default function PatientDashboard({
       gender: patientDetails.gender,
       allAppointments: [...patientDetails.allAppointments, newValues],
       timeStamp: new Date().toISOString(),
-      recordId: patientDetails.recordId
+      recordId: patientDetails.recordId,
     };
 
     console.log(sharedListData, "sharedListData");
@@ -203,7 +191,7 @@ export default function PatientDashboard({
         return;
       } else {
         setPatientDetails(dataSet);
-        setAppointmentItems([...patientDetails.allAppointments, newValues])
+        setAppointmentItems([...patientDetails.allAppointments, newValues]);
         console.log("Shared list sent to recipient");
         console.log(sendStatus.code, "status code");
       }
@@ -213,6 +201,18 @@ export default function PatientDashboard({
     }
   }
 
+  const [openAllAppointment, setOpenAllAppointment] = useState<boolean[]>(
+    Array(appointmentItems.length).fill(false),
+  );
+
+  useEffect(() => {
+    setOpenAllAppointment(Array(appointmentItems.length).fill(false));
+  }, [appointmentItems]);
+
+  // const [openMyNewAppointment, setOpenMyNewAppointment] = useState<boolean[]>(
+  //   Array(appointmentItems.length).fill(false),
+  // );
+  console.log(openAllAppointment, "items");
   return (
     <div className="relative h-full">
       {/* Background circles */}
@@ -231,7 +231,8 @@ export default function PatientDashboard({
           <div className="text-center sm:text-left">
             <h1 className="text-3xl font-bold">Hello Doctor,</h1>
             <p className="text-lg">
-              Welcome to {patientDetails.name ? patientDetails.name + "'s" : ""} dashboard
+              Welcome to {patientDetails.name ? patientDetails.name + "'s" : ""}{" "}
+              dashboard
             </p>
           </div>
         </div>
@@ -249,7 +250,7 @@ export default function PatientDashboard({
                 {appointmentItems.map((item, index) => (
                   <div
                     className="flex cursor-pointer items-center rounded-xl hover:bg-slate-100"
-                    key={item}
+                    key={index}
                     onClick={() => {
                       setOpenAllAppointment((prevState) => {
                         // set the index to true
@@ -263,23 +264,226 @@ export default function PatientDashboard({
                       key={index}
                       open={openAllAppointment[index]}
                       onOpenChange={(val) => {
-                        setOpenAllAppointment((prevState) => {
-                          // set the value to the value at the index
-                          let temp = [...prevState];
-                          temp[index] = val;
-                          return temp;
-                        });
+                        let temp = [...openAllAppointment];
+                        temp[index] = val;
+                        console.log(temp, "temp");
+                        setOpenAllAppointment([...temp]);
                       }}
                     >
-                      <DialogContent className="h-[90vh] max-w-[80vw]">
+                      <DialogContent className="mx-3 h-[90vh] max-w-fit">
                         <DialogHeader>
-                          <DialogTitle>
-                            Are you sure absolutely sure? {item}
+                          <DialogTitle asChild>
+                            <p className="text-3xl font-bold text-blue-800">
+                              Appointment Detail
+                            </p>
                           </DialogTitle>
                           <DialogDescription>
-                            This action cannot be undone. This will permanently
-                            delete your account and remove your data from our
-                            servers.
+                            <Formik
+                              initialValues={{
+                                problem: item.problem as string,
+                                diagnosis: item.diagnosis as string,
+                                medications: [
+                                  ...item.medications,
+                                ] as Medication[],
+                              }}
+                              onSubmit={(values, _) => {
+                                // console.log(values);
+                                addAppointment(values);
+                              }}
+                            >
+                              {(formik) => (
+                                <Form className="flex w-full flex-col items-center space-y-5 p-10">
+                                  <div className="w-full">
+                                    <Label htmlFor="problem" className="ml-1">
+                                      Problem
+                                    </Label>
+                                    <Field
+                                      disabled={true}
+                                      name="problem"
+                                      as={Textarea}
+                                      placeholder="Mention their Problem"
+                                      type="text"
+                                      className="mt-2 disabled:opacity-70"
+                                    />
+                                  </div>
+                                  <div className="w-full">
+                                    <Label htmlFor="diagnosis" className="ml-1">
+                                      Diagnosis
+                                    </Label>
+                                    <Field
+                                      disabled={true}
+                                      name="diagnosis"
+                                      as={Textarea}
+                                      placeholder="Diagnosis of the problem"
+                                      type="text"
+                                      className="mt-2 disabled:opacity-70"
+                                    />
+                                  </div>
+
+                                  <FieldArray name="medications">
+                                    {({ push, remove }) => (
+                                      <>
+                                        {/* <Button
+                                          type="button"
+                                          className="h-10 w-10 rounded-full p-1"
+                                          onClick={() =>
+                                            push({
+                                              name: "",
+                                              dosage: "",
+                                              frequency: "",
+                                            })
+                                          }
+                                        >
+                                          <Plus />
+                                        </Button> */}
+                                        {/* {console.log(item.medications, "medi")} */}
+                                        {item.medications.map(
+                                          (_: any, index: number) => (
+                                            <div
+                                              key={index}
+                                              className="flex w-full items-end gap-4"
+                                            >
+                                              <div className="w-full">
+                                                <Label
+                                                  htmlFor={`medications[${index}].name`}
+                                                  className="ml-1"
+                                                >
+                                                  Name of Medicine
+                                                </Label>
+                                                <Field
+                                                  disabled={true}
+                                                  name={`medications[${index}].name`}
+                                                  as={Input}
+                                                  placeholder="Name of Medicine"
+                                                  type="text"
+                                                  className="mt-2 disabled:opacity-70"
+                                                />
+                                              </div>
+                                              <div className="w-full">
+                                                <Label
+                                                  htmlFor={`medications[${index}].dosage`}
+                                                  className="ml-1"
+                                                >
+                                                  Dosage
+                                                </Label>
+                                                <Field
+                                                  disabled={true}
+                                                  name={`medications[${index}].dosage`}
+                                                  as={Input}
+                                                  placeholder="Dosage"
+                                                  type="text"
+                                                  className="mt-2 disabled:opacity-70"
+                                                />
+                                              </div>
+                                              <div className="w-full">
+                                                <Label
+                                                  htmlFor={`medications[${index}].frequency`}
+                                                  className="ml-1"
+                                                >
+                                                  Frequency
+                                                </Label>
+                                                <Field
+                                                  disabled={true}
+                                                  name={`medications[${index}].frequency`}
+                                                  as={Input}
+                                                  placeholder="Frequency of the medicine"
+                                                  type="text"
+                                                  className="mt-2 disabled:opacity-70"
+                                                />
+                                              </div>
+                                              <div className="flex w-full flex-col">
+                                                <Label
+                                                  htmlFor={`medications[${index}].tillDate`}
+                                                  className="ml-1"
+                                                >
+                                                  Till Date
+                                                </Label>
+                                                <div className="mt-[0.5rem]">
+                                                  <Popover>
+                                                    <PopoverTrigger asChild>
+                                                      <Button
+                                                        variant={"outline"}
+                                                        className={cn(
+                                                          "w-full pl-3 text-left font-normal",
+                                                          !formik.values
+                                                            .medications[index]
+                                                            .tillDate &&
+                                                            "text-muted-foreground",
+                                                        )}
+                                                      >
+                                                        {formik.values
+                                                          .medications[index]
+                                                          .tillDate ? (
+                                                          format(
+                                                            formik.values
+                                                              .medications[
+                                                              index
+                                                            ].tillDate,
+                                                            "PPP",
+                                                          )
+                                                        ) : (
+                                                          <span>
+                                                            Pick a date
+                                                          </span>
+                                                        )}
+                                                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                                      </Button>
+                                                    </PopoverTrigger>
+                                                    <PopoverContent
+                                                      className="w-auto p-0"
+                                                      align="start"
+                                                    >
+                                                      <Calendar
+                                                        className="w-full"
+                                                        mode="single"
+                                                        selected={
+                                                          formik.values
+                                                            .medications[index]
+                                                            .tillDate
+                                                        }
+                                                        onSelect={(value) => {
+                                                          {
+                                                            formik.setFieldValue(
+                                                              `medications[${index}].tillDate`,
+                                                              value,
+                                                            );
+                                                          }
+                                                        }}
+                                                        disabled={true}
+                                                        initialFocus
+                                                      />
+                                                    </PopoverContent>
+                                                  </Popover>
+                                                </div>
+                                              </div>
+                                              {/* <Button
+                                                className="h-8 w-8 rounded-full p-1"
+                                                onClick={() => remove(index)}
+                                              >
+                                                <Minus />
+                                              </Button> */}
+                                            </div>
+                                          ),
+                                        )}
+                                      </>
+                                    )}
+                                  </FieldArray>
+
+                                  <div className="w-full">
+                                    {/* <Button
+                                      type="submit"
+                                      className="group flex w-full items-center justify-center bg-blue-800 hover:bg-blue-900"
+                                      onClick={() =>
+                                        setOpenNewAppointment(false)
+                                      }
+                                    >
+                                      <p className="text-white">Add Details</p>
+                                      <ArrowRight className="ml-2 h-4 w-4 duration-100 ease-in-out group-hover:translate-x-1" />
+                                    </Button> */}
+                                  </div>
+                                </Form>
+                              )}
+                            </Formik>
                           </DialogDescription>
                         </DialogHeader>
                       </DialogContent>
@@ -291,10 +495,10 @@ export default function PatientDashboard({
                       </Avatar>
                       <div className="ml-4 mr-3 w-full space-y-1 truncate px-1 py-4">
                         <p className="truncate text-sm font-medium leading-none">
-                          Olivia Martin
+                          {item.problem}
                         </p>
                         <p className="truncate text-sm text-muted-foreground">
-                          olivia.martin@email.com
+                          {item.diagnosis}
                         </p>
                       </div>
                     </div>
@@ -395,7 +599,7 @@ export default function PatientDashboard({
                                   as={Textarea}
                                   placeholder="Mention their Problem"
                                   type="text"
-                                  className="mt-2"
+                                  className="mt-2 disabled:opacity-70"
                                 />
                               </div>
                               <div className="w-full">
@@ -407,7 +611,7 @@ export default function PatientDashboard({
                                   as={Textarea}
                                   placeholder="Diagnosis of the problem"
                                   type="text"
-                                  className="mt-2"
+                                  className="mt-2 disabled:opacity-70"
                                 />
                               </div>
 
@@ -445,7 +649,7 @@ export default function PatientDashboard({
                                               as={Input}
                                               placeholder="Name of Medicine"
                                               type="text"
-                                              className="mt-2"
+                                              className="mt-2 disabled:opacity-70"
                                             />
                                           </div>
                                           <div className="w-full">
@@ -460,7 +664,7 @@ export default function PatientDashboard({
                                               as={Input}
                                               placeholder="Dosage"
                                               type="text"
-                                              className="mt-2"
+                                              className="mt-2 disabled:opacity-70"
                                             />
                                           </div>
                                           <div className="w-full">
@@ -475,7 +679,7 @@ export default function PatientDashboard({
                                               as={Input}
                                               placeholder="Frequency of the medicine"
                                               type="text"
-                                              className="mt-2"
+                                              className="mt-2 disabled:opacity-70"
                                             />
                                           </div>
                                           <div className="flex w-full flex-col">
@@ -495,7 +699,7 @@ export default function PatientDashboard({
                                                       !formik.values
                                                         .medications[index]
                                                         .tillDate &&
-                                                      "text-muted-foreground",
+                                                        "text-muted-foreground",
                                                     )}
                                                   >
                                                     {formik.values.medications[
@@ -579,7 +783,7 @@ export default function PatientDashboard({
                         <div
                           className="flex cursor-pointer items-center rounded-xl px-3 hover:bg-slate-100"
                           key={item}
-                        // onClick={() => setOpenMyNewAppointment((prev) => !prev)}
+                          // onClick={() => setOpenMyNewAppointment((prev) => !prev)}
                         >
                           <div className="flex items-center gap-0 truncate sm:w-[70%]">
                             <Avatar className="h-9 w-9">
@@ -598,28 +802,26 @@ export default function PatientDashboard({
 
                           <div className="ml-auto flex flex-col items-end sm:w-fit">
                             <p className="text-right text-xs font-medium sm:text-sm">
-                              {new Date(patientDetails.timeStamp)?.toLocaleString(
-                                "en-us",
-                                {
-                                  year: "numeric",
-                                  month: "long",
-                                  day: "numeric",
-                                },
-                              )}
+                              {new Date(
+                                patientDetails.timeStamp,
+                              )?.toLocaleString("en-us", {
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                              })}
                             </p>
                             <p className="text-right text-xs font-normal sm:text-sm">
-                              {new Date(patientDetails.timeStamp)?.toLocaleString(
-                                "en-us",
-                                {
-                                  hour: "numeric",
-                                  minute: "numeric",
-                                  hour12: true,
-                                },
-                              )}
+                              {new Date(
+                                patientDetails.timeStamp,
+                              )?.toLocaleString("en-us", {
+                                hour: "numeric",
+                                minute: "numeric",
+                                hour12: true,
+                              })}
                             </p>
                           </div>
                         </div>
-                      )
+                      );
                     }
                   })}
                 </div>
