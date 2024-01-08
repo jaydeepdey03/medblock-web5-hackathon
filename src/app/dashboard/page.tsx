@@ -30,7 +30,7 @@ import createProtocolDefinition from "@/lib/Protocol";
 import { timeStamp } from "console";
 
 export default function Dashboard() {
-  const { web5, myDid, records, setRecords, updateDetailsToDoctor } = useGlobalStore();
+  const { web5, myDid, patientRecords, doctorRecords, updateDetailsToDoctor } = useGlobalStore();
 
   const [patients, setPatients] = useState<any[]>([]);
   const [doctors, setDoctors] = useState<any[]>([]);
@@ -43,24 +43,19 @@ export default function Dashboard() {
   });
 
 
-  let patientRecords: any = [];
-  let doctorRecords: any = [];
+  // let patientRecords: any = [];
+  // let doctorRecords: any = [];
 
   useEffect(() => {
 
-    console.log(records, "dasdsa");
-    records.forEach((record: any) => {
-      if (record.doctor === myDid) {
-        patientRecords.push(record);
-      } else {
-        doctorRecords.push(record);
-      }
-    });
+    if (patientRecords.length > 0) {
+      setPatients(patientRecords);
 
-    setPatients(patientRecords);
-    setDoctors(doctorRecords);
+    }
+    if (doctorRecords.length > 0)
+      setDoctors(doctorRecords);
 
-  }, [records, myDid])
+  }, [patientRecords, doctorRecords, myDid])
 
 
   const addNewPatient = async (patientDetails: any) => {
@@ -349,8 +344,8 @@ export default function Dashboard() {
                   // style={{ width: "100%" }} // Set width to 100%
                   key={i}
                   onClick={() =>
-                    // deletePatient(patient.recordId)
-                    router.push(`/patientDashboard/${patient.recordId}`)
+                    // deletePatient(patient.patient)
+                    router.push(`/patientDashboard/${patient.patient}`)
                   }
                 >
                   <div className="flex items-center gap-2">
@@ -400,7 +395,7 @@ export default function Dashboard() {
                   className="flex h-fit cursor-pointer flex-col rounded-xl border border-slate-200 bg-white p-5 duration-100 hover:scale-105"
                   style={{ width: "100%" }} // Set width to 100%
                   key={i}
-                  onClick={() => router.push(`/patientDashboard/${patient.recordId}`)}
+                  onClick={() => router.push(`/patientDashboard/${patient.patient}`)}
                 >
                   <div className="flex items-center gap-2">
                     {/* eslint-disable-next-line @next/next/no-img-element */}

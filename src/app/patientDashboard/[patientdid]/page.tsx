@@ -76,7 +76,7 @@ export default function PatientDashboard({
   const patientId = decodeURIComponent(params.patientdid);
   // console.log(patientId, "patientId");
 
-  const { web5, myDid, records, setRecords } = useGlobalStore();
+  const { web5, myDid, patientRecords: records, setRecords } = useGlobalStore();
 
   // let todoRecipient;
   // let todoList = ref({});
@@ -108,7 +108,7 @@ export default function PatientDashboard({
     gender: "",
     allAppointments: [],
     timeStamp: "",
-    recordId: ""
+    recordId: "",
   });
   const [appointmentItems, setAppointmentItems] = useState<any[]>([]);
 
@@ -131,6 +131,8 @@ export default function PatientDashboard({
         setAppointmentItems(patient.allAppointments);
       }
     }
+
+    console.log(records, "recordsss")
     if (web5 && myDid && records.length > 0 && patientId) {
       fetchDetails();
     }
@@ -149,6 +151,8 @@ export default function PatientDashboard({
       height: patientDetails.height,
       weight: patientDetails.weight,
       bloodGrp: patientDetails.bloodGrp,
+      patient: recipientDID,
+      doctor: myDid,
       recipient: recipientDID,
       gender: patientDetails.gender,
       allAppointments: [...patientDetails.allAppointments, values],

@@ -127,8 +127,10 @@ export default function DIDContextProvider({
     }
   };
 
-  const [records, setRecords] = useState<any[]>([]);
-  let myMap = new Map();
+  const [doctorRecords, setDoctorRecords] = useState<any[]>([]);
+  const [patientRecords, setPatientRecords] = useState<any[]>([]);
+  let patientMap = new Map();
+  let doctorMap = new Map();
 
   const fetchList = async (web5Instance: any) => {
     const protocolDefinition = await createProtocolDefinition();
@@ -158,19 +160,29 @@ export default function DIDContextProvider({
           }),
         );
 
-        let uniqueRecords: any = [];
+        let uniqueDoctorRecords: any = [];
+        let uniquePatientRecords: any = [];
         console.log(recordss, " ----");
 
         recordss.reverse().forEach((record: any) => {
 
-          if (!myMap.has(record.recipient)) {
-            myMap.set(record.recipient, true);
-            console.log(record, "--sda")
-            uniqueRecords.push(record);
+          if (!patientMap.has(record.doctor) && record.doctor === myDid) {
+            patientMap.set(record.patient, true);
+            console.log(record, "jaysda")
+            uniquePatientRecords.push(record);
+          }
+
+          if (!doctorMap.has(record.doctor) && record.patient === myDid) {
+            doctorMap.set(record.doctor, true);
+            console.log(record, "jaysda")
+            uniqueDoctorRecords.push(record);
           }
 
         });
-        setRecords(uniqueRecords);
+        console.log(uniqueDoctorRecords, "unique doctors");
+        console.log(uniquePatientRecords, "unique patient");
+        setDoctorRecords(uniqueDoctorRecords);
+        setPatientRecords(uniquePatientRecords)
       }
 
     } catch (error) {
@@ -179,70 +191,70 @@ export default function DIDContextProvider({
   };
 
 
-  const updateDetailsToDoctor = async (doctorDid: string) => {
-    console.log("updateDetailsToDoctor", doctorDid);
-    const protocolDefinition = await createProtocolDefinition();
+  // const updateDetailsToDoctor = async (doctorDid: string) => {
+  //   console.log("updateDetailsToDoctor", doctorDid);
+  //   const protocolDefinition = await createProtocolDefinition();
 
-    const recordd = records.filter(record =>
-      record.author === doctorDid
-    )[0]
+  //   const recordd = records.filter(record =>
+  //     record.author === doctorDid
+  //   )[0]
 
-    let recipientDID = doctorDid;
-    let allAppointmentsForPatient: any = [];
+  //   let recipientDID = doctorDid;
+  //   let allAppointmentsForPatient: any = [];
 
-    records.map((record) => {
-      if (record.allAppointments.length > record.allAppointments.length) {
-        allAppointmentsForPatient = record.allAppointments;
-      }
-    })
+  //   records.map((record) => {
+  //     if (record.allAppointments.length > record.allAppointments.length) {
+  //       allAppointmentsForPatient = record.allAppointments;
+  //     }
+  //   })
 
-    const sharedListData = {
-      "@type": "list",
-      author: myDid,
-      doctor: doctorDid,
-      patient: myDid,
-      name: recordd.name,
-      age: recordd.age,
-      height: recordd.height,
-      weight: recordd.weight,
-      bloodGrp: recordd.bloodGrp,
-      recipient: doctorDid,
-      gender: recordd.gender,
-      allAppointments: allAppointmentsForPatient,
-      timeStamp: new Date().toISOString(),
-    };
+  //   const sharedListData = {
+  //     "@type": "list",
+  //     author: myDid,
+  //     doctor: doctorDid,
+  //     patient: myDid,
+  //     name: recordd.name,
+  //     age: recordd.age,
+  //     height: recordd.height,
+  //     weight: recordd.weight,
+  //     bloodGrp: recordd.bloodGrp,
+  //     recipient: doctorDid,
+  //     gender: recordd.gender,
+  //     allAppointments: allAppointmentsForPatient,
+  //     timeStamp: new Date().toISOString(),
+  //   };
 
-    try {
-      const { record, status } = await web5.dwn.records.create({
-        data: sharedListData,
-        message: {
-          protocol: protocolDefinition.protocol,
-          protocolPath: "list",
-          schema: protocolDefinition.types.list.schema,
-          dataFormat: protocolDefinition.types.list.dataFormats[0],
-          recipient: recipientDID,
-        },
-      });
+  //   try {
+  //     const { record, status } = await web5.dwn.records.create({
+  //       data: sharedListData,
+  //       message: {
+  //         protocol: protocolDefinition.protocol,
+  //         protocolPath: "list",
+  //         schema: protocolDefinition.types.list.schema,
+  //         dataFormat: protocolDefinition.types.list.dataFormats[0],
+  //         recipient: recipientDID,
+  //       },
+  //     });
 
-      const data = await record.data.json();
-      const list = { record, ...data, id: record.id };
+  //     const data = await record.data.json();
+  //     const list = { record, ...data, id: record.id };
 
-      const { status: sendToMeStatus } = await record.send(myDid);
-      const { status: sendStatus } = await record.send(recipientDID);
-      console.log("Record sent", sendStatus);
+  //     const { status: sendToMeStatus } = await record.send(myDid);
+  //     const { status: sendStatus } = await record.send(recipientDID);
+  //     console.log("Record sent", sendStatus);
 
-      if (sendStatus.code !== 202) {
-        console.log("Unable to send to target did:" + sendStatus);
-        return;
-      } else {
-        console.log("Shared list sent to recipient");
-        console.log(sendStatus.code, "status code");
-      }
-    } catch (e) {
-      console.error(e, "err 2 in dashboard");
-      return;
-    }
-  }
+  //     if (sendStatus.code !== 202) {
+  //       console.log("Unable to send to target did:" + sendStatus);
+  //       return;
+  //     } else {
+  //       console.log("Shared list sent to recipient");
+  //       console.log(sendStatus.code, "status code");
+  //     }
+  //   } catch (e) {
+  //     console.error(e, "err 2 in dashboard");
+  //     return;
+  //   }
+  // }
 
   useEffect(() => {
     if (web5) {
@@ -251,7 +263,10 @@ export default function DIDContextProvider({
   }, [web5]);
 
   return (
-    <DIDContext.Provider value={{ web5, myDid, records, setRecords, updateDetailsToDoctor }}>
+    <DIDContext.Provider value={{
+      web5, myDid, doctorRecords, setDoctorRecords, patientRecords, setPatientRecords
+      // updateDetailsToDoctor 
+    }}>
       {children}
     </DIDContext.Provider>
   );
