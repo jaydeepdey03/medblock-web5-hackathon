@@ -129,8 +129,6 @@ export default function DIDContextProvider({
 
   const [doctorRecords, setDoctorRecords] = useState<any[]>([]);
   const [patientRecords, setPatientRecords] = useState<any[]>([]);
-  let patientMap = new Map();
-  let doctorMap = new Map();
 
   const fetchList = async (web5Instance: any) => {
     const protocolDefinition = await createProtocolDefinition();
@@ -160,26 +158,30 @@ export default function DIDContextProvider({
           }),
         );
 
+        let patientMap = new Map();
+        let doctorMap = new Map();
+
         let uniqueDoctorRecords: any = [];
         let uniquePatientRecords: any = [];
         console.log(recordss, " ----");
 
-        recordss.reverse().forEach((record: any) => {
+        recordss.reverse().map((record: any) => {
 
-          if (!patientMap.has(record.doctor) && record.doctor === myDid) {
+          console.log()
+          if (!patientMap.has(record.patient) && record.doctor === myDid) {
             patientMap.set(record.patient, true);
-            console.log(record, "jaysda")
+            console.log(record, "jaysdas")
             uniquePatientRecords.push(record);
           }
 
           if (!doctorMap.has(record.doctor) && record.patient === myDid) {
             doctorMap.set(record.doctor, true);
-            console.log(record, "jaysda")
+            console.log(record, "doc")
             uniqueDoctorRecords.push(record);
           }
 
         });
-        console.log(uniqueDoctorRecords, "unique doctors");
+        console.log(uniqueDoctorRecords, "unique doctorsss");
         console.log(uniquePatientRecords, "unique patient");
         setDoctorRecords(uniqueDoctorRecords);
         setPatientRecords(uniquePatientRecords)
