@@ -143,6 +143,11 @@ export default function PatientDashboard({
     const protocolDefinition = await createProtocolDefinition();
     let recipientDID = patientDetails.recipient;
 
+    const newValues = {
+      ...values,
+      doctor: myDid
+    }
+
     const sharedListData = {
       "@type": "list",
       author: myDid,
@@ -155,7 +160,7 @@ export default function PatientDashboard({
       doctor: myDid,
       recipient: recipientDID,
       gender: patientDetails.gender,
-      allAppointments: [...patientDetails.allAppointments, values],
+      allAppointments: [...patientDetails.allAppointments, newValues],
       timeStamp: new Date().toISOString(),
     };
 
@@ -168,7 +173,7 @@ export default function PatientDashboard({
       bloodGrp: patientDetails.bloodGrp,
       recipient: recipientDID,
       gender: patientDetails.gender,
-      allAppointments: [...patientDetails.allAppointments, values],
+      allAppointments: [...patientDetails.allAppointments, newValues],
       timeStamp: new Date().toISOString(),
       recordId: patientDetails.recordId
     };
@@ -198,7 +203,7 @@ export default function PatientDashboard({
         return;
       } else {
         setPatientDetails(dataSet);
-        setAppointmentItems([...patientDetails.allAppointments, values])
+        setAppointmentItems([...patientDetails.allAppointments, newValues])
         console.log("Shared list sent to recipient");
         console.log(sendStatus.code, "status code");
       }
@@ -568,51 +573,55 @@ export default function PatientDashboard({
                   </DialogContent>
                 </Dialog>
                 <div className="space-y-2">
-                  {appointmentItems.map((item) => (
-                    <div
-                      className="flex cursor-pointer items-center rounded-xl px-3 hover:bg-slate-100"
-                      key={item}
-                    // onClick={() => setOpenMyNewAppointment((prev) => !prev)}
-                    >
-                      <div className="flex items-center gap-0 truncate sm:w-[70%]">
-                        <Avatar className="h-9 w-9">
-                          <AvatarImage src="/avatars/01.png" alt="Avatar" />
-                          <AvatarFallback>OM</AvatarFallback>
-                        </Avatar>
-                        <div className="ml-4 mr-3 w-full space-y-1 truncate px-1 py-4">
-                          <p className="truncate text-sm font-medium leading-none">
-                            {item?.diagnosis}
-                          </p>
-                          <p className="truncate text-sm text-muted-foreground">
-                            {patientDetails.author}
-                          </p>
-                        </div>
-                      </div>
+                  {appointmentItems.map((item) => {
+                    if (item.doctor === myDid) {
+                      return (
+                        <div
+                          className="flex cursor-pointer items-center rounded-xl px-3 hover:bg-slate-100"
+                          key={item}
+                        // onClick={() => setOpenMyNewAppointment((prev) => !prev)}
+                        >
+                          <div className="flex items-center gap-0 truncate sm:w-[70%]">
+                            <Avatar className="h-9 w-9">
+                              <AvatarImage src="/avatars/01.png" alt="Avatar" />
+                              <AvatarFallback>OM</AvatarFallback>
+                            </Avatar>
+                            <div className="ml-4 mr-3 w-full space-y-1 truncate px-1 py-4">
+                              <p className="truncate text-sm font-medium leading-none">
+                                {item?.diagnosis}
+                              </p>
+                              <p className="truncate text-sm text-muted-foreground">
+                                {patientDetails.author}
+                              </p>
+                            </div>
+                          </div>
 
-                      <div className="ml-auto flex flex-col items-end sm:w-fit">
-                        <p className="text-right text-xs font-medium sm:text-sm">
-                          {new Date(patientDetails.timeStamp)?.toLocaleString(
-                            "en-us",
-                            {
-                              year: "numeric",
-                              month: "long",
-                              day: "numeric",
-                            },
-                          )}
-                        </p>
-                        <p className="text-right text-xs font-normal sm:text-sm">
-                          {new Date(patientDetails.timeStamp)?.toLocaleString(
-                            "en-us",
-                            {
-                              hour: "numeric",
-                              minute: "numeric",
-                              hour12: true,
-                            },
-                          )}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
+                          <div className="ml-auto flex flex-col items-end sm:w-fit">
+                            <p className="text-right text-xs font-medium sm:text-sm">
+                              {new Date(patientDetails.timeStamp)?.toLocaleString(
+                                "en-us",
+                                {
+                                  year: "numeric",
+                                  month: "long",
+                                  day: "numeric",
+                                },
+                              )}
+                            </p>
+                            <p className="text-right text-xs font-normal sm:text-sm">
+                              {new Date(patientDetails.timeStamp)?.toLocaleString(
+                                "en-us",
+                                {
+                                  hour: "numeric",
+                                  minute: "numeric",
+                                  hour12: true,
+                                },
+                              )}
+                            </p>
+                          </div>
+                        </div>
+                      )
+                    }
+                  })}
                 </div>
               </CardContent>
             </div>

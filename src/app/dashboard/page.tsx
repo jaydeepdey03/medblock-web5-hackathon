@@ -463,7 +463,7 @@ export default function Dashboard() {
                       doctor.author.slice(-8)}
                   </CardDescription>
                 </div>
-                <Button onClick={() => updateDetailsToDoctor(doctor.author)}>Send Details</Button>
+                <Button onClick={() => updateDetailsToDoctor(doctor.doctor)}>Send Details</Button>
               </CardHeader>
               {/* <CardContent>
               <p>Card Content</p>

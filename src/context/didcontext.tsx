@@ -193,70 +193,70 @@ export default function DIDContextProvider({
   };
 
 
-  // const updateDetailsToDoctor = async (doctorDid: string) => {
-  //   console.log("updateDetailsToDoctor", doctorDid);
-  //   const protocolDefinition = await createProtocolDefinition();
+  const updateDetailsToDoctor = async (doctorDid: string) => {
+    console.log("updateDetailsToDoctor", doctorDid);
+    const protocolDefinition = await createProtocolDefinition();
 
-  //   const recordd = records.filter(record =>
-  //     record.author === doctorDid
-  //   )[0]
+    let allAppointmentsForPatient: any = [];
 
-  //   let recipientDID = doctorDid;
-  //   let allAppointmentsForPatient: any = [];
+    doctorRecords.map((record: any) => {
+      allAppointmentsForPatient.push(...record.allAppointments);
+    })
 
-  //   records.map((record) => {
-  //     if (record.allAppointments.length > record.allAppointments.length) {
-  //       allAppointmentsForPatient = record.allAppointments;
-  //     }
-  //   })
+    const recordd = doctorRecords.filter(record =>
+      record.doctor === doctorDid
+    )[0]
 
-  //   const sharedListData = {
-  //     "@type": "list",
-  //     author: myDid,
-  //     doctor: doctorDid,
-  //     patient: myDid,
-  //     name: recordd.name,
-  //     age: recordd.age,
-  //     height: recordd.height,
-  //     weight: recordd.weight,
-  //     bloodGrp: recordd.bloodGrp,
-  //     recipient: doctorDid,
-  //     gender: recordd.gender,
-  //     allAppointments: allAppointmentsForPatient,
-  //     timeStamp: new Date().toISOString(),
-  //   };
+    let recipientDID = doctorDid;
 
-  //   try {
-  //     const { record, status } = await web5.dwn.records.create({
-  //       data: sharedListData,
-  //       message: {
-  //         protocol: protocolDefinition.protocol,
-  //         protocolPath: "list",
-  //         schema: protocolDefinition.types.list.schema,
-  //         dataFormat: protocolDefinition.types.list.dataFormats[0],
-  //         recipient: recipientDID,
-  //       },
-  //     });
 
-  //     const data = await record.data.json();
-  //     const list = { record, ...data, id: record.id };
+    const sharedListData = {
+      "@type": "list",
+      author: myDid,
+      doctor: doctorDid,
+      patient: myDid,
+      name: recordd.name,
+      age: recordd.age,
+      height: recordd.height,
+      weight: recordd.weight,
+      bloodGrp: recordd.bloodGrp,
+      recipient: doctorDid,
+      gender: recordd.gender,
+      allAppointments: allAppointmentsForPatient,
+      timeStamp: new Date().toISOString(),
+    };
 
-  //     const { status: sendToMeStatus } = await record.send(myDid);
-  //     const { status: sendStatus } = await record.send(recipientDID);
-  //     console.log("Record sent", sendStatus);
+    try {
+      const { record, status } = await web5.dwn.records.create({
+        data: sharedListData,
+        message: {
+          protocol: protocolDefinition.protocol,
+          protocolPath: "list",
+          schema: protocolDefinition.types.list.schema,
+          dataFormat: protocolDefinition.types.list.dataFormats[0],
+          recipient: recipientDID,
+        },
+      });
 
-  //     if (sendStatus.code !== 202) {
-  //       console.log("Unable to send to target did:" + sendStatus);
-  //       return;
-  //     } else {
-  //       console.log("Shared list sent to recipient");
-  //       console.log(sendStatus.code, "status code");
-  //     }
-  //   } catch (e) {
-  //     console.error(e, "err 2 in dashboard");
-  //     return;
-  //   }
-  // }
+      const data = await record.data.json();
+      const list = { record, ...data, id: record.id };
+
+      const { status: sendToMeStatus } = await record.send(myDid);
+      const { status: sendStatus } = await record.send(recipientDID);
+      console.log("Record sent", sendStatus);
+
+      if (sendStatus.code !== 202) {
+        console.log("Unable to send to target did:" + sendStatus);
+        return;
+      } else {
+        console.log("Shared list sent to recipient");
+        console.log(sendStatus.code, "status code");
+      }
+    } catch (e) {
+      console.error(e, "err 2 in dashboard");
+      return;
+    }
+  }
 
   useEffect(() => {
     if (web5) {
@@ -266,8 +266,7 @@ export default function DIDContextProvider({
 
   return (
     <DIDContext.Provider value={{
-      web5, myDid, doctorRecords, setDoctorRecords, patientRecords, setPatientRecords
-      // updateDetailsToDoctor 
+      web5, myDid, doctorRecords, setDoctorRecords, patientRecords, setPatientRecords, updateDetailsToDoctor
     }}>
       {children}
     </DIDContext.Provider>
