@@ -25,6 +25,10 @@
         {
           "who": "anyone",
           "can": "query"
+        },
+        {
+          "who": "author",
+          "can": "delete"
         }
       ],
       "appointment": {
@@ -37,12 +41,17 @@
           {
             "who": "recipient",
             "of": "list",
-            "can": "read"
+            "can": "write"
           },
           {
             "who": "anyone",
             "of": "list",
             "can": "query"
+          },
+          {
+            "who": "author",
+            "of": "list",
+            "can": "delete"
           }
         ]
       }

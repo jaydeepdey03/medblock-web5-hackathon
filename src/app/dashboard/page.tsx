@@ -27,9 +27,10 @@ import Fuse from "fuse.js";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardDescription, CardHeader } from "@/components/ui/card";
 import createProtocolDefinition from "@/lib/Protocol";
+import { timeStamp } from "console";
 
 export default function Dashboard() {
-  const { web5, myDid } = useGlobalStore();
+  const { web5, myDid, records, setRecords, updateDetailsToDoctor } = useGlobalStore();
 
   const [patients, setPatients] = useState<any[]>([]);
   const [doctors, setDoctors] = useState<any[]>([]);
@@ -41,67 +42,26 @@ export default function Dashboard() {
     keys: ["name"],
   });
 
-  const fetchList = async (web5Instance: any) => {
-    const protocolDefinition = await createProtocolDefinition();
-    try {
-      console.log("Fetching list...");
 
-      const response = await web5Instance.dwn.records.query({
-        from: myDid,
-        message: {
-          filter: {
-            protocol: protocolDefinition.protocol,
-            schema: protocolDefinition.types.list.schema,
-          },
-        },
-      });
-      console.log("Saved Response", response);
+  let patientRecords: any = [];
+  let doctorRecords: any = [];
 
-      if (response.status.code === 200) {
-        const records = await Promise.all(
-          response.records.map(async (record: any) => {
-            const data = await record.data.json();
-            return {
-              ...data,
-              recordId: record.id,
-            };
-          }),
-        );
-        const patientRecords: any[] = [];
-        const doctorRecords: any = [];
-        records.forEach((record) => {
-          if (record.author === myDid) {
-            patientRecords.push(record);
-          } else {
-            doctorRecords.push(record);
-          }
-        });
-        setDoctors(doctorRecords);
-        setPatients(patientRecords);
-        console.log("Patient records:", patientRecords);
-        return patientRecords;
+  useEffect(() => {
+
+    console.log(records, "dasdsa");
+    records.forEach((record: any) => {
+      if (record.doctor === myDid) {
+        patientRecords.push(record);
+      } else {
+        doctorRecords.push(record);
       }
+    });
 
-      // add entry to sharedList
-      // let patientsArray: any[] = [];
-      // for (let record of records) {
-      //   const data = await record.data.json();
-      //   const list = { record, ...data, id: record.id };
+    setPatients(patientRecords);
+    setDoctors(doctorRecords);
 
-      //   // console.log("Added record", list);
-      //   // // add to existing state of the patient
-      //   if (!patientsArray.some((item) => item.id === list.id)) {
-      //     patientsArray.push(list);
-      //   }
-      //   // setPatients((prev) => [list, ...prev]);
-      //   console.log("Updated records", patientsArray);
-      //   if (patientsArray.length !== patients.length)
-      //     setPatients(patientsArray);
-      // }
-    } catch (error) {
-      console.log("err 1 in dashboard ", error);
-    }
-  };
+  }, [records, myDid])
+
 
   const addNewPatient = async (patientDetails: any) => {
     const protocolDefinition = await createProtocolDefinition();
@@ -112,12 +72,16 @@ export default function Dashboard() {
       "@type": "list",
       author: myDid,
       name: patientDetails.name,
+      doctor: myDid,
+      patient: recipientDID,
       age: patientDetails.age,
       height: patientDetails.height,
       weight: patientDetails.weight,
       bloodGrp: patientDetails.bloodGrp,
       recipient: recipientDID,
       gender: patientDetails.gender,
+      allAppointments: [],
+      timeStamp: new Date().toISOString(),
     };
     console.log(sharedListData, "sharedListData");
     try {
@@ -157,13 +121,7 @@ export default function Dashboard() {
     console.log(web5, "web5 in dashboard");
   }, [web5]);
 
-  useEffect(() => {
-    if (web5) {
-      fetchList(web5);
-    }
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [web5]);
 
   const deletePatient = async (recordId: string) => {
     console.log("deletePatient", recordId);
@@ -346,7 +304,7 @@ export default function Dashboard() {
         Welcome to dashboard
       </p>
 
-      <Tabs defaultValue="doctor" className="w-full">
+      <Tabs defaultValue="patient" className="w-full">
         <TabsList className="ml-10 flex justify-between">
           <div>
             <TabsTrigger value="patient">Patient</TabsTrigger>
@@ -379,9 +337,8 @@ export default function Dashboard() {
           <div
             className="grid h-full w-full place-items-center gap-4 px-10"
             style={{
-              gridTemplateColumns: `repeat(auto-${
-                patients.length <= 1 ? "fit" : "fill"
-              }, minmax(400px, 1fr))`,
+              gridTemplateColumns: `repeat(auto-${patients.length <= 1 ? "fit" : "fill"
+                }, minmax(400px, 1fr))`,
             }}
           >
             {searchPattern.length === 0 &&
@@ -392,6 +349,7 @@ export default function Dashboard() {
                   // style={{ width: "100%" }} // Set width to 100%
                   key={i}
                   onClick={() =>
+                    // deletePatient(patient.recordId)
                     router.push(`/patientDashboard/${patient.recordId}`)
                   }
                 >
@@ -442,7 +400,7 @@ export default function Dashboard() {
                   className="flex h-fit cursor-pointer flex-col rounded-xl border border-slate-200 bg-white p-5 duration-100 hover:scale-105"
                   style={{ width: "100%" }} // Set width to 100%
                   key={i}
-                  onClick={() => router.push(`/patientDashboard/${patient.id}`)}
+                  onClick={() => router.push(`/patientDashboard/${patient.recordId}`)}
                 >
                   <div className="flex items-center gap-2">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -510,7 +468,7 @@ export default function Dashboard() {
                       doctor.author.slice(-8)}
                   </CardDescription>
                 </div>
-                <Button>Send Details</Button>
+                <Button onClick={() => updateDetailsToDoctor(doctor.author)}>Send Details</Button>
               </CardHeader>
               {/* <CardContent>
               <p>Card Content</p>
