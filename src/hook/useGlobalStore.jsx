@@ -1,5 +1,5 @@
 import {useContext} from "react";
-import {DIDContext} from "../context/didcontext";
+import {DIDContext} from "../context/Didcontext";
 
 const useGlobalStore = () => {
   return useContext(DIDContext);
