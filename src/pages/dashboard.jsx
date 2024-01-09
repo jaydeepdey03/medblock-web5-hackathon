@@ -23,8 +23,22 @@ import {
 } from "@/components/ui/select";
 import Fuse from "fuse.js";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
-import {Card, CardDescription, CardHeader} from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+} from "@/components/ui/card";
 import createProtocolDefinition from "@/lib/Protocol";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {differenceInDays, parseISO} from "date-fns";
 
 export default function Dashboard() {
   const {web5, myDid, patientRecords, doctorRecords, updateDetailsToDoctor} =
@@ -149,6 +163,26 @@ export default function Dashboard() {
     console.log(myDid);
     alert("DID copied to clipboard");
   };
+
+  const [medicines, setMedicines] = useState([]);
+
+  useEffect(() => {
+    if (myHistory && myHistory.length > 0) {
+      // map all the patient records and get the medicines array from each record
+      // and then flatten it to a single array
+      let temp = [];
+
+      myHistory.map((item) => {
+        item.medications.map((medi) => {
+          temp.push(medi);
+        });
+      });
+
+      setMedicines([...temp]);
+    }
+  }, [patientRecords]);
+
+  console.log(medicines, "medicines in dash");
 
   return (
     <div className="relative flex h-full w-full flex-col gap-2 p-5">
@@ -495,6 +529,57 @@ export default function Dashboard() {
           value="myappointment"
           className="flex flex-col space-y-3 pt-4 items-center"
         >
+          <Card className="card-scroll h-full overflow-y-scroll p-0 w-1/2">
+            <CardContent className="p-0">
+              <Table>
+                <TableHeader className="sticky top-0">
+                  <TableRow>
+                    <TableHead className="w-[200px]">Medicine Name</TableHead>
+                    <TableHead>Dosage</TableHead>
+                    <TableHead>Frequency</TableHead>
+                    <TableHead className="text-right">Days Left</TableHead>
+                  </TableRow>
+                </TableHeader>
+
+                <TableBody className="w-full">
+                  {/* <div className="w-full overflow-y-scroll"> */}
+
+                  {medicines &&
+                    medicines.map((medi, index) => {
+                      // Skip records with empty attributes
+                      if (!medi.name || !medi.dosage || !medi.frequency) {
+                        return null;
+                      }
+                      const tillDate = parseISO(medi.tillDate);
+                      const today = new Date();
+
+                      const duration = differenceInDays(tillDate, today);
+                      console.log(duration, "duration");
+                      return (
+                        <TableRow key={index}>
+                          <TableCell className="font-medium">
+                            {medi.name}
+                          </TableCell>
+                          <TableCell>{medi.dosage}</TableCell>
+                          <TableCell>{medi.frequency}</TableCell>
+                          <TableCell className="text-right">
+                            {duration}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+
+                  {/* </div> */}
+                  {/* Add more rows if needed */}
+                </TableBody>
+              </Table>
+              {medicines && medicines.length === 0 && (
+                <div className="h-full p-7">
+                  <p className="text-center">No Medicines</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
           {myHistory.length === 0 && <p>No Appointment</p>}
           <div className="flex flex-col h-full w-[80%] place-items-center gap-4 px-10">
             {myHistory &&

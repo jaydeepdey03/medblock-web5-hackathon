@@ -119,6 +119,7 @@ export default function PatientDashboard() {
     const newValues = {
       ...values,
       doctor: myDid,
+      timeStamp: new Date().toString(),
     };
 
     const sharedListData = {
@@ -571,7 +572,7 @@ export default function PatientDashboard() {
                       if (!medi.name || !medi.dosage || !medi.frequency) {
                         return null;
                       }
-                      const tillDate = parseISO(medi.tillDate);
+                      const tillDate = medi.tillDate;
                       const today = new Date();
 
                       const duration = differenceInDays(tillDate, today);
