@@ -1,24 +1,28 @@
 "use client";
-import { createContext, ReactNode, useState, useEffect } from "react";
+import {createContext, ReactNode, useState, useEffect} from "react";
 // import protocolDefinition from "../assets/shared-user-protocol.json";
-import { Web5 } from "@web5/api";
+import {Web5} from "@web5/api";
 import createProtocolDefinition from "@/lib/Protocol";
 
 export const DIDContext = createContext({});
-export default function DIDContextProvider({ children }) {
+export default function DIDContextProvider({children}) {
   const [web5, setWeb5] = useState(null);
   const [myDid, setMyDid] = useState(null);
   const PROTOCOL_URL = "https://didcomm.org/shared-user-protocol";
 
   useEffect(() => {
     const initWeb5 = async () => {
-      const { web5: web5Instance, did } = await Web5.connect({
-        sync: "5s",
-      });
-      console.log(did);
+      try {
+        const {web5: web5Instance, did} = await Web5.connect({
+          sync: "5s",
+        });
+        console.log(did);
 
-      setWeb5(web5Instance);
-      setMyDid(did);
+        setWeb5(web5Instance);
+        setMyDid(did);
+      } catch (err) {
+        console.log("error while connecting to web5", err.message);
+      }
     };
     initWeb5();
   }, []);
@@ -71,7 +75,7 @@ export default function DIDContextProvider({ children }) {
 
   const installProtocol = async (web5, protocolDefinition, did) => {
     try {
-      const { protocol } = await web5.dwn.protocols.configure({
+      const {protocol} = await web5.dwn.protocols.configure({
         message: {
           definition: protocolDefinition,
         },
@@ -90,26 +94,26 @@ export default function DIDContextProvider({ children }) {
     // }
     const protocolDefinition = await createProtocolDefinition();
     try {
-      const { protocols: localProtocol, status: localProtocolStatus } =
+      const {protocols: localProtocol, status: localProtocolStatus} =
         await queryProtocol(web5);
-      console.log({ localProtocol, localProtocolStatus }, "localProtocol");
+      console.log({localProtocol, localProtocolStatus}, "localProtocol");
 
       // if protocol is not installed, install it
       if (localProtocolStatus.code !== 200 || localProtocol.length === 0) {
         const protocolValueAfterInstallation = await installProtocol(
           web5,
           protocolDefinition,
-          myDid,
+          myDid
         );
         console.log(
           "Protocol installed successfully",
-          protocolValueAfterInstallation,
+          protocolValueAfterInstallation
         );
 
-        const { status: configureRemoteStatus } = await localProtocol.send(did);
+        const {status: configureRemoteStatus} = await localProtocol.send(did);
         console.log(
           "Did the protocol install on the remote DWN?",
-          configureRemoteStatus,
+          configureRemoteStatus
         );
       } else {
         console.log("Protocol already installed");
@@ -146,7 +150,7 @@ export default function DIDContextProvider({ children }) {
               ...data,
               recordId: record.id,
             };
-          }),
+          })
         );
 
         let patientMap = new Map();
@@ -191,7 +195,7 @@ export default function DIDContextProvider({ children }) {
     });
 
     const recordd = doctorRecords.filter(
-      (record) => record.doctor === doctorDid,
+      (record) => record.doctor === doctorDid
     )[0];
 
     let recipientDID = doctorDid;
@@ -213,7 +217,7 @@ export default function DIDContextProvider({ children }) {
     };
 
     try {
-      const { record, status } = await web5.dwn.records.create({
+      const {record, status} = await web5.dwn.records.create({
         data: sharedListData,
         message: {
           protocol: protocolDefinition.protocol,
@@ -225,10 +229,10 @@ export default function DIDContextProvider({ children }) {
       });
 
       const data = await record.data.json();
-      const list = { record, ...data, id: record.id };
+      const list = {record, ...data, id: record.id};
 
-      const { status: sendToMeStatus } = await record.send(myDid);
-      const { status: sendStatus } = await record.send(recipientDID);
+      const {status: sendToMeStatus} = await record.send(myDid);
+      const {status: sendStatus} = await record.send(recipientDID);
       console.log("Record sent", sendStatus);
 
       if (sendStatus.code !== 202) {
