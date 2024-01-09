@@ -122,6 +122,28 @@ export default function Dashboard() {
     }
   };
 
+  const [myHistory, setMyHistory] = useState([]);
+
+  useEffect(() => {
+    // set the myHistory to the records of the patient which has myAppointment in maximum length using reduce
+    let len = 0;
+    let idx = 0;
+    if (doctorRecords.length > 0) {
+      doctorRecords.forEach((curr, index) => {
+        if (curr.allAppointments.length > len) {
+          console.log(curr, "curr");
+          len = curr.allAppointments.length;
+          idx = index;
+        }
+      });
+
+      setMyHistory(doctorRecords[idx].allAppointments);
+      console.log(doctorRecords[idx].allAppointments, "temp");
+    }
+  }, [doctorRecords]);
+
+  // console.log(, "myhis");
+
   const handleCopyDid = () => {
     navigator.clipboard.writeText(myDid);
     console.log(myDid);
@@ -285,8 +307,11 @@ export default function Dashboard() {
           </DialogHeader>
         </DialogContent>
       </Dialog>
-      <p className="mb-6 py-5 text-center font-inter text-4xl font-bold text-blue-900">
-        Welcome to dashboard
+      <p className="py-5 text-center font-inter text-4xl font-bold text-blue-900">
+        Dashboard
+      </p>
+      <p className="mb-6 text-md text-center">
+        <span>Your DID:</span> {myDid?.slice(0, 16) + "..." + myDid?.slice(-8)}
       </p>
 
       <Tabs defaultValue="patient" className="w-full">
@@ -294,6 +319,7 @@ export default function Dashboard() {
           <div>
             <TabsTrigger value="patient">Patient</TabsTrigger>
             <TabsTrigger value="doctor">Doctor</TabsTrigger>
+            <TabsTrigger value="myappointment">My Appointments</TabsTrigger>
           </div>
           <div className="mr-10">
             <Button onClick={handleCopyDid} className="w-fit">
@@ -327,13 +353,14 @@ export default function Dashboard() {
               }, minmax(400px, 1fr))`,
             }}
           >
+            {patientRecords.length === 0 && <p>No Patient Records</p>}
             {searchPattern.length === 0 &&
               patients &&
-              patients.map((patient, i) => (
+              patients.map((patient, index) => (
                 <div
                   className="flex h-fit w-full cursor-pointer flex-col rounded-xl border border-slate-200 bg-white p-5"
                   // style={{ width: "100%" }} // Set width to 100%
-                  key={i}
+                  key={index}
                   onClick={() =>
                     // deletePatient(patient.patient)
                     router.push(`/patientDashboard/${patient.patient}`)
@@ -347,10 +374,7 @@ export default function Dashboard() {
                       className="h-9 w-9"
                     />
                     <div className="flex flex-col">
-                      <p className="text-sm capitalize">
-                        {patient.name} {searchPattern.length}
-                        {patients.length}
-                      </p>
+                      <p className="text-sm capitalize">{patient.name}</p>
                       <p className="text-xs capitalize">{patient.gender}</p>
                     </div>
                   </div>
@@ -381,11 +405,11 @@ export default function Dashboard() {
               ))}
             {/* If not searching  */}
             {searchPattern.length > 0 &&
-              fuse.search(searchPattern)?.map(({item: patient}, i) => (
+              fuse.search(searchPattern)?.map(({item: patient}, index) => (
                 <div
                   className="flex h-fit cursor-pointer flex-col rounded-xl border border-slate-200 bg-white p-5 duration-100 hover:scale-105"
                   style={{width: "100%"}} // Set width to 100%
-                  key={i}
+                  key={index}
                   onClick={() =>
                     router.push(`/patientDashboard/${patient.patient}`)
                   }
@@ -445,6 +469,7 @@ export default function Dashboard() {
           value="doctor"
           className="mx-10 flex flex-col space-y-3 pt-4"
         >
+          {doctors.length === 0 && <p className="text-center">No Doctors</p>}
           {doctors.map((doctor, index) => (
             <Card className="h-[100px] shadow-none" key={index}>
               <CardHeader className="flex w-full flex-row justify-between">
@@ -465,6 +490,72 @@ export default function Dashboard() {
             </CardContent> */}
             </Card>
           ))}
+        </TabsContent>
+        <TabsContent
+          value="myappointment"
+          className="flex flex-col space-y-3 pt-4 items-center"
+        >
+          {myHistory.length === 0 && <p>No Appointment</p>}
+          <div className="flex flex-col h-full w-[80%] place-items-center gap-4 px-10">
+            {myHistory &&
+              myHistory.map((item, index) => (
+                <>
+                  <div
+                    className="flex h-fit w-full flex-col rounded-xl border border-slate-200 bg-white p-5"
+                    style={{width: "100%"}} // Set width to 100%
+                    key={index}
+                    // onClick={() =>
+                    //   // deletePatient(patient.patient)
+                    //   router.push(`/patientDashboard/${patient.patient}`)
+                    // }
+                  >
+                    <div className="flex items-center gap-2">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      {/* <img
+                      src={`/${patient.gender === "male" ? "boy" : "girl"}.png`}
+                      alt="doctor"
+                      className="h-9 w-9"
+                    /> */}
+                      <div className="flex flex-col">
+                        <p className="text-sm capitalize">
+                          From:{" "}
+                          <span className="font-bold">
+                            {item.doctor.slice(0, 15) +
+                              "..." +
+                              item.doctor.slice(-8)}
+                          </span>
+                          {/* {patients.length} */}
+                        </p>
+                        {/* <p className="text-xs capitalize">{patient.gender}</p> */}
+                      </div>
+                    </div>
+                    <div className="flex flex-col gap-2 py-3">
+                      <p className="truncate text-sm">
+                        <span className="font-medium">Problem:</span>{" "}
+                        {item.problem}
+                      </p>
+                      <p className="truncate text-sm">
+                        <span className="font-medium">Diagnosis:</span>{" "}
+                        {item.diagnosis}
+                      </p>
+                      {/* <p className="truncate text-sm">
+                        <span className="font-medium">Blood Group:&nbsp;</span>
+
+                        {patient.bloodGrp?.toUpperCase()}
+                      </p>
+                      <p className="truncate text-sm">
+                        <span className="font-medium">Height:</span>{" "}
+                        {patient.height}
+                      </p>
+                      <p className="truncate text-sm">
+                        <span className="font-medium">Weight:</span>{" "}
+                        {patient.weight}
+                      </p> */}
+                    </div>
+                  </div>
+                </>
+              ))}
+          </div>
         </TabsContent>
       </Tabs>
     </div>

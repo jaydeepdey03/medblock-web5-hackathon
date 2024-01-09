@@ -214,6 +214,9 @@ export default function PatientDashboard() {
   }, [appointmentItems]);
 
   console.log(medicines, "medi");
+
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   return (
     <div className="relative h-full">
       {/* Background circles */}
@@ -248,6 +251,9 @@ export default function PatientDashboard() {
           <div className="card-scroll h-full w-full overflow-y-scroll">
             <CardContent className="overflow-hidden p-0">
               <div className="space-y-2 px-7">
+                {appointmentItems.length === 0 && (
+                  <p className="text-center">No Appointments</p>
+                )}
                 {appointmentItems.map((item, index) => (
                   <div
                     className="flex cursor-pointer items-center rounded-xl hover:bg-slate-100"
@@ -556,8 +562,9 @@ export default function PatientDashboard() {
                   </TableRow>
                 </TableHeader>
 
-                <TableBody className="">
+                <TableBody className="w-full">
                   {/* <div className="w-full overflow-y-scroll"> */}
+
                   {medicines &&
                     medicines.map((medi, index) => {
                       // Skip records with empty attributes
@@ -587,6 +594,11 @@ export default function PatientDashboard() {
                   {/* Add more rows if needed */}
                 </TableBody>
               </Table>
+              {medicines && medicines.length === 0 && (
+                <div className="h-full p-7">
+                  <p className="text-center">No Medicines</p>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -817,6 +829,9 @@ export default function PatientDashboard() {
                   </DialogContent>
                 </Dialog>
                 <div className="space-y-2">
+                  {appointmentItems.length === 0 && (
+                    <p className="text-center">No Appointments</p>
+                  )}
                   {appointmentItems.map((item) => {
                     if (item.doctor === myDid) {
                       return (

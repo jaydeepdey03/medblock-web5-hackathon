@@ -16,14 +16,14 @@ export default function Home() {
               <p className="text-5xl font-extrabold text-pink-200 sm:text-8xl">
                 MedBlock
               </p>
-              <p className="text-md px-4 font-semibold text-pink-100 sm:text-xl">
+              <p className="text-md font-semibold text-pink-100 sm:text-xl">
                 Your Decentralized Patient ID for Modern Appointments
               </p>
               <Button
                 className="group flex w-[200px] space-x-2 rounded-full bg-pink-400 hover:bg-pink-500"
                 onClick={() => router.push("/dashboard")}
               >
-                <span>Add Patient ID</span>
+                <span>Go to Dashboard</span>
                 <ArrowRight className="mr-2 h-4 w-4 duration-200 ease-in-out group-hover:translate-x-1" />
               </Button>
             </div>
@@ -32,8 +32,8 @@ export default function Home() {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               // src="https://img.freepik.com/free-vector/flat-national-doctor-s-day-illustration-with-female-medic_23-2149449714.jpg?w=740&t=st=1703664836~exp=1703665436~hmac=fcd8cc227be3c32f2ab52cc1a3869d5fc57b5f82b812cfef03191889b0f0100a"
-              src="/doctor2.png"
-              alt="doctor2"
+              src="/doctor6.png"
+              alt="doctor6"
               className="absolute h-full xl:bottom-0 xl:mt-auto xl:h-[80%]"
             />
           </div>
