@@ -1,118 +1,138 @@
-import Image from 'next/image'
+import { Button } from "@/components/ui/button";
+import { ArrowRight } from "lucide-react";
 import { Inter } from 'next/font/google'
+import { useRouter } from 'next/router';
 
 const inter = Inter({ subsets: ['latin'] })
 
 export default function Home() {
+  const router = useRouter();
   return (
-    <main
-      className={`flex min-h-screen flex-col items-center justify-between p-24 ${inter.className}`}
-    >
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">src/pages/index.js</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
+    <div className="h-screen min-h-screen w-full font-poppins">
+      <div className="flex h-full w-full justify-center p-5 font-poppins">
+        <div className="relative flex h-full w-full flex-col rounded-xl bg-blue-900 xl:flex-row">
+          <div className="grid h-full w-full place-items-center rounded-xl ">
+            <div className="flex flex-col items-center space-y-8 text-center xl:items-start">
+              <p className="text-5xl font-extrabold text-pink-200 sm:text-8xl">
+                MedBlock
+              </p>
+              <p className="text-md px-4 font-semibold text-pink-100 sm:text-xl">
+                Your Decentralized Patient ID for Modern Appointments
+              </p>
+              <Button
+                className="group flex w-[200px] space-x-2 rounded-full bg-pink-400 hover:bg-pink-500"
+                onClick={() => router.push("/dashboard")}
+              >
+                <span>Add Patient ID</span>
+                <ArrowRight className="mr-2 h-4 w-4 duration-200 ease-in-out group-hover:translate-x-1" />
+              </Button>
+            </div>
+          </div>
+          <div className="relative flex h-full w-full items-center justify-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              // src="https://img.freepik.com/free-vector/flat-national-doctor-s-day-illustration-with-female-medic_23-2149449714.jpg?w=740&t=st=1703664836~exp=1703665436~hmac=fcd8cc227be3c32f2ab52cc1a3869d5fc57b5f82b812cfef03191889b0f0100a"
+              src="/doctor2.png"
+              alt="doctor2"
+              className="absolute h-full xl:bottom-0 xl:mt-auto xl:h-[80%]"
             />
-          </a>
+          </div>
         </div>
       </div>
-
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700/10 after:dark:from-sky-900 after:dark:via-[#0141ff]/40 before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
+      <div className="flex h-fit w-full flex-col gap-5 p-5 lg:flex-row">
+        <div className="rounded-3xl bg-pink-300 p-6 px-3 duration-150 ease-in-out hover:scale-105 xl:h-[450px] xl:w-1/4">
+          <div
+            className="flex h-full w-full
+           flex-col items-center justify-around space-y-7 text-center xl:space-x-0"
+          >
+            <p className="text-3xl font-bold text-blue-900 2xl:text-4xl">
+              Decentralized Patient IDs
+            </p>
+            <p className="font-inter text-lg text-blue-950">
+              Seize control of your health with decentralized IDs for a private,
+              modern experience
+            </p>
+            <div className="relative">
+              {/* <div className="bg-stone-400 rounded-full h-24 w-24 z-10 -top-5 -left-5 blur-2xl absolute" /> */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/card.png"
+                alt="card"
+                className="relative z-20 h-32 w-auto" // Set a higher z-index value
+              />
+            </div>
+          </div>
+        </div>
+        <div className="rounded-3xl bg-yellow-400 p-6 px-3 duration-150 ease-in-out hover:scale-105 xl:h-[450px] xl:w-1/4">
+          <div
+            className="flex h-full w-full
+           flex-col items-center justify-around space-y-7 text-center xl:space-x-0"
+          >
+            <p className="text-3xl font-bold text-blue-900 2xl:text-4xl">
+              Seamless Appointment Booking
+            </p>
+            <p className="text-blue-95 font-inter text-lg">
+              Seize control of your health with decentralized IDs for a private,
+              modern experience
+            </p>
+            <div className="relative">
+              {/* <div className="bg-stone-400 rounded-full h-24 w-24 z-10 -top-5 -left-5 blur-2xl absolute" /> */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/booking.png"
+                alt="booking"
+                className="relative z-20 h-32 w-auto" // Set a higher z-index value
+              />
+            </div>
+          </div>
+        </div>
+        <div className="rounded-3xl bg-purple-300 p-6 px-3 duration-150 ease-in-out hover:scale-105 xl:h-[450px] xl:w-1/4">
+          <div
+            className="flex h-full w-full
+           flex-col items-center justify-around space-y-7 text-center xl:space-x-0"
+          >
+            <p className="text-3xl font-bold text-blue-900 2xl:text-4xl">
+              Empowering Telehealth
+            </p>
+            <p className="font-inter text-lg text-blue-950">
+              Telehealth anywhere: Use your decentralized ID for secure medical
+              expertise at home
+            </p>
+            <div className="relative">
+              {/* <div className="bg-stone-400 rounded-full h-24 w-24 z-10 -top-5 -left-5 blur-2xl absolute" /> */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/consult.png"
+                alt="consult"
+                className="relative z-20 h-32 w-auto" // Set a higher z-index value
+              />
+            </div>
+          </div>
+        </div>
+        <div className="rounded-3xl bg-red-300 p-6 px-3 duration-150 ease-in-out hover:scale-105 xl:h-[450px] xl:w-1/4">
+          <div
+            className="flex h-full w-full
+           flex-col items-center justify-around space-y-7 text-center xl:space-x-0"
+          >
+            <p className="text-3xl font-bold text-blue-900 2xl:text-4xl">
+              Interconnected Health Records
+            </p>
+            <p className="font-inter text-lg text-blue-950">
+              Connected healthcare: ID links seamlessly with records for
+              comprehensive information across providers.
+            </p>
+            <div className="relative">
+              {/* <div className="bg-stone-400 rounded-full h-24 w-24 z-10 -top-5 -left-5 blur-2xl absolute" /> */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/record.png"
+                alt="record"
+                className="relative z-20 h-32 w-auto" // Set a higher z-index value
+              />
+            </div>
+          </div>
+        </div>
       </div>
-
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Discover and deploy boilerplate example Next.js&nbsp;projects.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+    </div>
   )
 }
