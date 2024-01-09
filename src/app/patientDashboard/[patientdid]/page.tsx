@@ -47,8 +47,16 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { format, set } from "date-fns";
+import { differenceInDays, format, parse, parseISO, set } from "date-fns";
 import createProtocolDefinition from "@/lib/Protocol";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 type Medication = {
   name: string;
@@ -212,7 +220,23 @@ export default function PatientDashboard({
   // const [openMyNewAppointment, setOpenMyNewAppointment] = useState<boolean[]>(
   //   Array(appointmentItems.length).fill(false),
   // );
-  console.log(openAllAppointment, "items");
+  console.log(appointmentItems, "items");
+
+  const [medicines, setMedicines] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (appointmentItems && appointmentItems.length > 0) {
+      let temp: any[] = [];
+      appointmentItems.map((item) => {
+        item.medications.map((medi: any) => {
+          temp.push(medi);
+        });
+      });
+      setMedicines([...temp]);
+    }
+  }, [appointmentItems]);
+
+  console.log(medicines, "medi");
   return (
     <div className="relative h-full">
       {/* Background circles */}
@@ -237,7 +261,7 @@ export default function PatientDashboard({
           </div>
         </div>
       </div>
-      <div className="grid h-screen grid-flow-row grid-cols-1 gap-4 p-8 xl:grid-cols-3 xl:grid-rows-3">
+      <div className="grid h-screen grid-flow-row grid-cols-1 gap-4 p-8 xl:grid-cols-3 xl:grid-rows-4">
         <Card className="order-last col-start-1 col-end-2 row-span-full flex h-[600px] w-full flex-col xl:h-full">
           <CardHeader>
             <CardTitle className="flex justify-between">
@@ -531,8 +555,8 @@ export default function PatientDashboard({
             </CardContent>
           </div>
         </Card>
-        <div className="order-first grid h-[600px] w-full grid-cols-1 gap-2 rounded-xl xl:col-span-full xl:col-start-2 xl:col-end-4 xl:row-start-1 xl:row-end-2 xl:h-full xl:grid-cols-3">
-          <div className="flex h-full w-full flex-col items-center justify-center space-y-2 rounded-xl border-[1px] border-slate-200 bg-white">
+        <div className="xl:grid-cols- order-first grid h-[600px] w-full grid-cols-1 gap-2 rounded-xl xl:col-span-full xl:col-start-2 xl:col-end-4 xl:row-start-1 xl:row-end-3 xl:h-full">
+          {/* <div className="flex h-full w-full flex-col items-center justify-center space-y-2 rounded-xl border-[1px] border-slate-200 bg-white">
             <Ruler className="h-[50px] w-[50px] text-slate-700" />
             <p className="text-sm font-medium">Height</p>
             <p className="text-3xl font-semibold">{patientDetails?.height}cm</p>
@@ -548,23 +572,69 @@ export default function PatientDashboard({
             <p className="text-3xl font-semibold uppercase">
               {patientDetails?.bloodGrp}
             </p>
-          </div>
+          </div> */}
+
+          <Card className="card-scroll h-full overflow-y-scroll p-0">
+            <CardContent className="p-0">
+              <Table>
+                <TableHeader className="sticky top-0">
+                  <TableRow>
+                    <TableHead className="w-[200px]">Medicine Name</TableHead>
+                    <TableHead>Dosage</TableHead>
+                    <TableHead>Frequency</TableHead>
+                    <TableHead className="text-right">Days Left</TableHead>
+                  </TableRow>
+                </TableHeader>
+
+                <TableBody className="">
+                  {/* <div className="w-full overflow-y-scroll"> */}
+                  {medicines &&
+                    medicines.map((medi, index) => {
+                      // Skip records with empty attributes
+                      if (!medi.name || !medi.dosage || !medi.frequency) {
+                        return null;
+                      }
+                      const tillDate = parseISO(medi.tillDate);
+                      const today = new Date();
+
+                      const duration = differenceInDays(tillDate, today);
+                      console.log(duration, "duration");
+                      return (
+                        <TableRow key={index}>
+                          <TableCell className="font-medium">
+                            {medi.name}
+                          </TableCell>
+                          <TableCell>{medi.dosage}</TableCell>
+                          <TableCell>{medi.frequency}</TableCell>
+                          <TableCell className="text-right">
+                            {duration}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+
+                  {/* </div> */}
+                  {/* Add more rows if needed */}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
         </div>
-        <div className="h-[600px] w-full overflow-hidden rounded-xl xl:col-start-2 xl:col-end-4 xl:row-start-2 xl:row-end-4 xl:h-full">
-          <Card className="h-full">
-            <CardHeader className="flex flex-row justify-between">
+        <div className="h-[600px] w-full rounded-xl xl:col-start-2 xl:col-end-4 xl:row-start-3 xl:row-end-5 xl:h-full">
+          <Card className="h-full overflow-hidden">
+            <CardHeader className="flex flex-row items-start justify-between">
               <p className="text-2xl font-[600] leading-none tracking-tight">
                 My Appointment
               </p>
               <Button
-                className="w-fit"
+                className="m-0 w-fit"
                 onClick={() => setOpenNewAppointment((prev) => !prev)}
               >
                 Add New Appointment
               </Button>
             </CardHeader>
             <div className="card-scroll h-full w-full overflow-y-scroll">
-              <CardContent className="overflow-hidden">
+              <CardContent className="">
                 <Dialog
                   open={openNewAppointment}
                   onOpenChange={setOpenNewAppointment}
